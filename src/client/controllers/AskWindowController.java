@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 
+import javax.print.DocFlavor;
 import javax.swing.text.Position;
 import java.time.LocalDate;
 
@@ -186,10 +187,12 @@ public class AskWindowController {
         nameField.setText(labWork.getName());
         coordinatesXField.setText(labWork.getCoordinates().getX() + "");
         coordinatesYField.setText(labWork.getCoordinates().getY() + "");
-        salaryField.setText(labWork.getDifficulty() + "");
-        organizationNameField.setText(worker.getOrganization().getFullName() != null ? worker.getOrganization().getFullName() : "");
-        endDateField.setText(worker.getEndDate() != null ? DateConverter.dateToString(worker.getEndDate()) : "");
+        minimalPointField.setText(labWork.getMinimalPoint()+"");
+        personalQualitiesMinimumField.setText(labWork.getPersonalQualitiesMinimum()+"");
+        averagePointField.setText(labWork.getAveragePoint()+"");
         difficultyBox.setValue(labWork.getDifficulty());
+        nameDisciplineField.setText(labWork.getDiscipline().getName()+"");
+        lectureHoursDisciplineField.setText(labWork.getDiscipline().getLectureHours()+"");
     }
 
     @FXML
@@ -198,13 +201,12 @@ public class AskWindowController {
 
             String name = readName();
             Coordinates coords = readCoords();
-            long salary = readDifficulty();
-            LocalDate date = readEndDate();
-            Position pos = readDifficulty();
-            Status stat = readStatus();
-            Organization org = readOrganization();
-            worker = new DefaultWorker(name, coords, salary, date, pos, stat, org);
-
+            Integer minimalPoint = readMinimalPoint();
+            int personalQualitiesMinimum=readPersonalQualitiesMinimum();
+            Double averagePoint=readAveragePoint();
+            Difficulty difficulty = readDifficulty();
+            Discipline discipline=readDiscipline();
+            labWork = new LabWork(name, coords, minimalPoint, personalQualitiesMinimum, averagePoint,difficulty,discipline);
             askStage.close();
         } catch (InvalidDataException | IllegalArgumentException exception) {
             app.getOutputManager().error(exception.getMessage());
@@ -254,7 +256,7 @@ public class AskWindowController {
 
     public void setAskStage(Stage askStage) {
         this.askStage = askStage;
-        this.askStage.setOnCloseRequest((e) -> worker = null);
+        this.askStage.setOnCloseRequest((e) -> labWork = null);
     }
 
     public void setApp(App app) {
@@ -275,12 +277,29 @@ public class AskWindowController {
         nameLabel.textProperty().bind(resourceFactory.getStringBinding("NameColumn"));
         coordinatesXLabel.textProperty().bind(resourceFactory.getStringBinding("CoordinatesXColumn"));
         coordinatesYLabel.textProperty().bind(resourceFactory.getStringBinding("CoordinatesYColumn"));
-        endDateLabel.textProperty().bind(resourceFactory.getStringBinding("EndDateColumn"));
-        positionLabel.textProperty().bind(resourceFactory.getStringBinding("PositionColumn"));
-        statusLabel.textProperty().bind(resourceFactory.getStringBinding("StatusColumn"));
-        organizationNameLabel.textProperty().bind(resourceFactory.getStringBinding("OrganizationNameColumn"));
-        organizationTypeLabel.textProperty().bind(resourceFactory.getStringBinding("OrganizationTypeColumn"));
-        salaryLabel.textProperty().bind(resourceFactory.getStringBinding("SalaryColumn"));
+        minimalPointLabel.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
+        personalQualitiesMinimumLabel.textProperty().bind(resourceFactory.getStringBinding("PersonalQualitiesMinimumColumn"));
+        averagePointLabel.textProperty().bind(resourceFactory.getStringBinding("AveragePointColumn"));
+        difficultyLabel.textProperty().bind(resourceFactory.getStringBinding("DifficultyColumn"));
+        nameDisciplineLabel.textProperty().bind(resourceFactory.getStringBinding("NameDisciplineColumn"));
+        lectureHoursDisciplineLabel.textProperty().bind(resourceFactory.getStringBinding("LectureHoursDisciplineColumn"));
         enterButton.textProperty().bind(resourceFactory.getStringBinding("EnterButton"));
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
