@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.auth.User;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
@@ -9,15 +9,14 @@ import common.connection.CollectionOperation;
 import common.connection.Response;
 import common.exceptions.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static common.utils.Parser.parseId;
 
 public class UpdateCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public UpdateCommand(WorkerManager cm) {
+    public UpdateCommand(LabWorkManager cm) {
         super("update", CommandType.NORMAL, CollectionOperation.UPDATE);
         collectionManager = cm;
     }

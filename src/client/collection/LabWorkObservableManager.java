@@ -1,25 +1,24 @@
 package client.collection;
 
 import client.controllers.MainWindowController;
-import common.collection.WorkerManagerImpl;
+import common.collection.LabWorkManagerImpl;
 import common.connection.CollectionOperation;
 import common.connection.Response;
-import common.data.Worker;
+
+import common.data.LabWork;
 import common.exceptions.NoSuchIdException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableView;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
-public class WorkerObservableManager extends WorkerManagerImpl<ObservableList<Worker>> {
-    private ObservableList<Worker> collection;
+public class LabWorkObservableManager extends LabWorkManagerImpl<ObservableList<LabWork>> {
+    private ObservableList<LabWork> collection;
     private Set<Integer> uniqueIds;
     private MainWindowController controller;
-    public WorkerObservableManager(){
+    public LabWorkObservableManager(){
         collection = FXCollections.observableArrayList();
         uniqueIds = ConcurrentHashMap.newKeySet();
     }

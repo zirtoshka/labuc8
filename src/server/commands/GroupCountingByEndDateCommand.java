@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 
@@ -10,9 +10,9 @@ import java.util.Map;
 import static common.utils.DateConverter.dateToString;
 
 public class GroupCountingByEndDateCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public GroupCountingByEndDateCommand(WorkerManager cm) {
+    public GroupCountingByEndDateCommand(LabWorkManager cm) {
         super("group_counting_by_end_date", CommandType.NORMAL);
         collectionManager = cm;
     }

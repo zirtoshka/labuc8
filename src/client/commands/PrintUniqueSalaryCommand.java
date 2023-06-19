@@ -1,7 +1,7 @@
 package client.commands;
 
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 import common.exceptions.EmptyCollectionException;
@@ -9,17 +9,15 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class PrintUniqueSalaryCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public PrintUniqueSalaryCommand(WorkerManager cm) {
+    public PrintUniqueSalaryCommand(LabWorkManager cm) {
         super("print_unique_salary", CommandType.NORMAL);
         collectionManager = cm;
     }

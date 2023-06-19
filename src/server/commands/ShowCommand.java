@@ -1,14 +1,14 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 import common.exceptions.EmptyCollectionException;
 
 public class ShowCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public ShowCommand(WorkerManager cm) {
+    public ShowCommand(LabWorkManager cm) {
         super("show", CommandType.NORMAL);
         collectionManager = cm;
     }

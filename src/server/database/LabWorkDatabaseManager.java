@@ -5,7 +5,7 @@ import common.data.*;
 import common.exceptions.*;
 import common.utils.DateConverter;
 import server.auth.UserManager;
-import server.collection.WorkerDequeManager;
+import server.collection.LabWorkDequeManager;
 import server.log.Log;
 
 import java.sql.PreparedStatement;
@@ -18,14 +18,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class WorkerDatabaseManager extends WorkerDequeManager {
+public class LabWorkDatabaseManager extends LabWorkDequeManager {
     //language=SQL
     private final static String INSERT_WORKER_QUERY = "INSERT INTO WORKERS (name, coordinates_x, coordinates_y, creation_date, salary, end_date, position, status, organization_full_name, organization_type, user_login,id)" +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,DEFAULT) RETURNING id; ";
     private final DatabaseHandler databaseHandler;
     private final UserManager userManager;
 
-    public WorkerDatabaseManager(DatabaseHandler c, UserManager userManager) throws DatabaseException {
+    public LabWorkDatabaseManager(DatabaseHandler c, UserManager userManager) throws DatabaseException {
         super();
         databaseHandler = c;
         this.userManager = userManager;

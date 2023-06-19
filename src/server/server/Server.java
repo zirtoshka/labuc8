@@ -1,7 +1,7 @@
 package server.server;
 
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 
 import common.auth.User;
 import common.commands.CommandType;
@@ -12,7 +12,7 @@ import server.auth.UserManager;
 import server.commands.ServerCommandManager;
 import server.database.DatabaseHandler;
 import server.database.UserDatabaseManager;
-import server.database.WorkerDatabaseManager;
+import server.database.LabWorkDatabaseManager;
 import server.exceptions.ServerOnlyCommandException;
 import server.log.Log;
 
@@ -30,7 +30,7 @@ import java.util.concurrent.*;
 public class Server extends Thread implements SenderReceiver {
     public final int MAX_CLIENTS = 10;
 
-    private WorkerManager collectionManager;
+    private LabWorkManager collectionManager;
     private ServerCommandManager commandManager;
     private DatabaseHandler databaseHandler;
     private UserManager userManager;
@@ -66,7 +66,7 @@ public class Server extends Thread implements SenderReceiver {
 
         databaseHandler = new DatabaseHandler(properties.getProperty("url"), properties.getProperty("user"), properties.getProperty("password"));
         userManager = new UserDatabaseManager(databaseHandler);
-        collectionManager = new WorkerDatabaseManager(databaseHandler, userManager);
+        collectionManager = new LabWorkDatabaseManager(databaseHandler, userManager);
         commandManager = new ServerCommandManager(this);
 
 
@@ -277,7 +277,7 @@ public class Server extends Thread implements SenderReceiver {
         }
     }
 
-    public WorkerManager getCollectionManager() {
+    public LabWorkManager getCollectionManager() {
         return collectionManager;
     }
 

@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.auth.User;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
@@ -15,9 +15,9 @@ import java.util.Arrays;
 import static common.utils.Parser.parseId;
 
 public class RemoveByIdCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public RemoveByIdCommand(WorkerManager cm) {
+    public RemoveByIdCommand(LabWorkManager cm) {
         super("remove_by_id", CommandType.NORMAL, CollectionOperation.REMOVE);
         collectionManager = cm;
     }

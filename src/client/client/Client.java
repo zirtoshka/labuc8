@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.*;
 import java.nio.ByteBuffer;
 
-import client.collection.WorkerObservableManager;
+import client.collection.LabWorkObservableManager;
 import client.commands.ClientCommandManager;
 import client.controllers.tools.ObservableResourceFactory;
 import client.controllers.tools.ResourceException;
@@ -39,7 +39,7 @@ public class Client extends Thread implements SenderReceiver {
     private volatile boolean authSuccess;
 
     private boolean connected;
-    private WorkerObservableManager collectionManager;
+    private LabWorkObservableManager collectionManager;
     private ObservableResourceFactory resourceFactory;
     public boolean isReceivedRequest(){
         return receivedRequest;
@@ -56,7 +56,7 @@ public class Client extends Thread implements SenderReceiver {
         running = true;
         connected = false;
         authSuccess = false;
-        collectionManager = new WorkerObservableManager();
+        collectionManager = new LabWorkObservableManager();
         commandManager = new ClientCommandManager(this);
         //setDaemon(true);
         setName("client thread");
@@ -320,7 +320,7 @@ public class Client extends Thread implements SenderReceiver {
     public boolean isAuthSuccess(){
         return authSuccess;
     }
-    public WorkerObservableManager getWorkerManager(){
+    public LabWorkObservableManager getWorkerManager(){
         return collectionManager;
     }
     public ClientCommandManager getCommandManager(){return commandManager;}

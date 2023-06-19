@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.auth.User;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
@@ -9,14 +9,14 @@ import common.connection.CollectionOperation;
 import common.connection.Response;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.InvalidDataException;
-import server.database.WorkerDatabaseManager;
+import server.database.LabWorkDatabaseManager;
 
 public class ClearCommand extends CommandImpl {
-    private final WorkerDatabaseManager collectionManager;
+    private final LabWorkDatabaseManager collectionManager;
 
-    public ClearCommand(WorkerManager cm) {
+    public ClearCommand(LabWorkManager cm) {
         super("clear", CommandType.NORMAL, CollectionOperation.REMOVE);
-        collectionManager = (WorkerDatabaseManager) cm;
+        collectionManager = (LabWorkDatabaseManager) cm;
     }
 
     @Override

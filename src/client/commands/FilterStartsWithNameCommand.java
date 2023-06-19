@@ -1,6 +1,6 @@
 package client.commands;
 
-import client.collection.WorkerObservableManager;
+import client.collection.LabWorkObservableManager;
 import client.controllers.MainWindowController;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
@@ -11,9 +11,9 @@ import javafx.application.Platform;
 import java.util.List;
 
 public class FilterStartsWithNameCommand extends CommandImpl {
-    private final WorkerObservableManager collectionManager;
+    private final LabWorkObservableManager collectionManager;
 
-    public FilterStartsWithNameCommand(WorkerObservableManager cm) {
+    public FilterStartsWithNameCommand(LabWorkObservableManager cm) {
         super("filter_starts_with_name", CommandType.NORMAL);
         collectionManager = cm;
     }

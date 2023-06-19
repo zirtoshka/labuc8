@@ -1,7 +1,7 @@
 
 package common.collection;
 
-import common.data.Worker;
+import common.data.LabWork;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -12,21 +12,21 @@ import java.util.Map;
  * interface for storing elements
  *
  */
-public interface WorkerManager {
+public interface LabWorkManager {
 
     /**
      * sorts collection
      */
     void sort();
 
-    Collection<Worker> getCollection();
+    Collection<LabWork> getCollection();
 
     /**
      * adds new element
      *
      * @param element
      */
-    void add(Worker element);
+    void add(LabWork element);
 
     /**
      * get information about collection
@@ -56,12 +56,12 @@ public interface WorkerManager {
      * @param id
      * @param newElement
      */
-    void updateByID(Integer id, Worker newElement);
+    void updateByID(Integer id, LabWork newElement);
 
 
     void clear();
 
-    public Worker getByID(Integer id);
+    public LabWork getByID(Integer id);
 
     void removeFirst();
 
@@ -70,21 +70,21 @@ public interface WorkerManager {
      *
      * @param element
      */
-    void addIfMax(Worker element);
+    void addIfMax(LabWork element);
 
     /**
      * adds element if it is smaller than min
      *
      * @param element
      */
-    void addIfMin(Worker element);
+    void addIfMin(LabWork element);
 
     /**
      * print all elements which name starts with substring
      *
      * @param start
      */
-    List<Worker> filterStartsWithName(String start);
+    List<LabWork> filterStartsWithName(String start);
 
     /**
      * @return map of dates with quantity

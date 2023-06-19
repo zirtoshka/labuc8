@@ -1,7 +1,7 @@
 package server.commands;
 
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 import common.exceptions.EmptyCollectionException;
@@ -9,9 +9,9 @@ import common.exceptions.EmptyCollectionException;
 import java.util.List;
 
 public class PrintUniqueSalaryCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public PrintUniqueSalaryCommand(WorkerManager cm) {
+    public PrintUniqueSalaryCommand(LabWorkManager cm) {
         super("print_unique_salary", CommandType.NORMAL);
         collectionManager = cm;
     }

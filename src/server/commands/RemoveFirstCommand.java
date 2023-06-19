@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.auth.User;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
@@ -11,9 +11,9 @@ import common.exceptions.InvalidDataException;
 import common.exceptions.PermissionException;
 
 public class RemoveFirstCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public RemoveFirstCommand(WorkerManager cm) {
+    public RemoveFirstCommand(LabWorkManager cm) {
         super("remove_first", CommandType.NORMAL, CollectionOperation.REMOVE);
         collectionManager = cm;
     }

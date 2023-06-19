@@ -5,10 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
-import common.collection.WorkerManager;
-import common.collection.WorkerManagerImpl;
-import common.data.Worker;
-import common.exceptions.CannotAddException;
+import common.collection.LabWorkManager;
+import common.collection.LabWorkManagerImpl;
+import common.data.LabWork;
 import common.exceptions.CollectionException;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.NoSuchIdException;
@@ -26,15 +25,15 @@ import java.util.stream.Collectors;
 /**
  * Operates collection.
  */
-public class WorkerDequeManager extends WorkerManagerImpl<ConcurrentLinkedDeque<Worker>>{
-    private Deque<Worker> collection;
+public class LabWorkDequeManager extends LabWorkManagerImpl<ConcurrentLinkedDeque<LabWork>> {
+    private Deque<LabWork> collection;
     private final java.time.LocalDateTime initDate;
     private final Set<Integer> uniqueIds;
 
     /**
      * Constructor, set start values
      */
-    public WorkerDequeManager() {
+    public LabWorkDequeManager() {
         uniqueIds = new ConcurrentSkipListSet<>();
         collection = new ConcurrentLinkedDeque<>();
         initDate = java.time.LocalDateTime.now();
@@ -55,12 +54,12 @@ public class WorkerDequeManager extends WorkerManagerImpl<ConcurrentLinkedDeque<
         }
     }
     @Override
-    public Deque<Worker> getCollection(){
+    public Deque<LabWork> getCollection(){
         return collection;
     }
 
     public void sort() {
-        collection = collection.stream().sorted(new Worker.SortingComparator()).collect(Collectors.toCollection(ConcurrentLinkedDeque::new));
+        collection = collection.stream().sorted(new LabWork.SortingComparator()).collect(Collectors.toCollection(ConcurrentLinkedDeque::new));
     }
 
 
@@ -68,33 +67,33 @@ public class WorkerDequeManager extends WorkerManagerImpl<ConcurrentLinkedDeque<
     /**
      * Add element to collection
      *
-     * @param worker Element of collection
+     * @param labWork Element of collection
      */
-    public void add(Worker worker) {
+    public void add(LabWork labWork) {
         int id = generateNextId();
         uniqueIds.add(id);
-        worker.setId(id);
-        collection.add(worker);
+        labWork.setId(id);
+        collection.add(labWork);
     }
 
-    public Worker getByID(Integer id){
+    public LabWork getByID(Integer id){
         assertNotEmpty();
-        Optional<Worker> worker = collection.stream()
+        Optional<LabWork> labWork = collection.stream()
                 .filter(w -> w.getId() == id)
                 .findFirst();
-        if(!worker.isPresent()){
+        if(!labWork.isPresent()){
             throw new NoSuchIdException(id);
         }
-        return worker.get();
+        return labWork.get();
     }
-    protected void addWithoutIdGeneration(Worker worker){
-        uniqueIds.add(worker.getId());
-        collection.add(worker);
+    protected void addWithoutIdGeneration(LabWork labWork){
+        uniqueIds.add(labWork.getId());
+        collection.add(labWork);
     }
 
-    protected Collection<Worker> getAll(Collection<Integer> ids){
+    protected Collection<LabWork> getAll(Collection<Integer> ids){
         Iterator<Integer> iterator = ids.iterator();
-        Collection<Worker> selected = new HashSet<>();
+        Collection<LabWork> selected = new HashSet<>();
         while (iterator.hasNext()){
             Integer id = iterator.next();
             selected.addAll(collection.stream().filter(w->w.getId()==id).collect(Collectors.toCollection(HashSet::new)));
@@ -133,13 +132,13 @@ public class WorkerDequeManager extends WorkerManagerImpl<ConcurrentLinkedDeque<
 
     public void removeByID(Integer id) {
         assertNotEmpty();
-        Optional<Worker> worker = collection.stream()
+        Optional<LabWork> labWork = collection.stream()
                 .filter(w -> w.getId() == id)
                 .findFirst();
-        if(!worker.isPresent()){
+        if(!labWork.isPresent()){
             throw new NoSuchIdException(id);
         }
-        collection.remove(worker.get());
+        collection.remove(labWork.get());
         uniqueIds.remove(id);
     }
 
@@ -148,17 +147,17 @@ public class WorkerDequeManager extends WorkerManagerImpl<ConcurrentLinkedDeque<
      *
      * @param id ID
      */
-    public void updateByID(Integer id, Worker newWorker) {
+    public void updateByID(Integer id, LabWork newLabWork) {
         assertNotEmpty();
-        Optional<Worker> worker = collection.stream()
+        Optional<LabWork> labWork = collection.stream()
                 .filter(w -> w.getId() == id)
                 .findFirst();
-        if (!worker.isPresent()) {
+        if (!labWork.isPresent()) {
             throw new NoSuchIdException(id);
         }
-        collection.remove(worker.get());
-        newWorker.setId(id);
-        collection.add(newWorker);
+        collection.remove(labWork.get());
+        newLabWork.setId(id);
+        collection.add(newLabWork);
     }
 
     /**
@@ -189,7 +188,7 @@ public class WorkerDequeManager extends WorkerManagerImpl<ConcurrentLinkedDeque<
             if (json == null || json.equals("")) {
                 collection = new ConcurrentLinkedDeque<>();
             } else {
-                Type collectionType = new TypeToken<Queue<Worker>>() {
+                Type collectionType = new TypeToken<Queue<LabWork>>() {
                 }.getType();
                 Gson gson = new GsonBuilder()
                         .registerTypeAdapter(LocalDate.class, new LocalDateDeserializer())

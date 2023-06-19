@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.auth.User;
 import common.commands.Command;
 import common.commands.CommandManager;
@@ -23,7 +23,7 @@ public class ServerCommandManager extends CommandManager {
 
     public ServerCommandManager(Server serv) {
         server = serv;
-        WorkerManager collectionManager = server.getCollectionManager();
+        LabWorkManager collectionManager = server.getCollectionManager();
         userManager = server.getUserManager();
         addCommand(new ExitCommand());
         addCommand(new HelpCommand());

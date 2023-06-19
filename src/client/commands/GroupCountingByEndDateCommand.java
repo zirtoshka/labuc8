@@ -1,7 +1,6 @@
 package client.commands;
 
 import client.client.Client;
-import common.collection.WorkerManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 import javafx.application.Platform;
@@ -9,14 +8,12 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static common.utils.DateConverter.dateToString;
 

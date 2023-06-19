@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 import common.connection.AnswerMsg;
@@ -11,12 +11,11 @@ import common.exceptions.CommandException;
 import common.exceptions.InvalidDataException;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 public class AddCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public AddCommand(WorkerManager cm) {
+    public AddCommand(LabWorkManager cm) {
         super("add", CommandType.NORMAL, CollectionOperation.ADD);
         collectionManager = cm;
     }

@@ -3,31 +3,27 @@ package common.collection;
 
 
 
-import common.data.Worker;
+import common.data.LabWork;
 import common.exceptions.CannotAddException;
-import common.exceptions.CollectionException;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.NoSuchIdException;
 
-import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 
 /**
  * Operates collection.
  */
-public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements WorkerManager {
+public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implements LabWorkManager {
 
     private final java.time.LocalDateTime initDate;
 
     /**
      * Constructor, set start values
      */
-    public WorkerManagerImpl() {
+    public LabWorkManagerImpl() {
         initDate = java.time.LocalDateTime.now();
     }
 
@@ -52,7 +48,7 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
      *
      * @return Collection
      */
-    public abstract Collection<Worker> getCollection();
+    public abstract Collection<LabWork> getCollection();
 
 
     /**
@@ -60,24 +56,24 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
      *
      * @param worker Element of collection
      */
-    public void add(Worker worker) {
+    public void add(LabWork labWork) {
         int id = generateNextId();
         getUniqueIds().add(id);
-        worker.setId(id);
-        getCollection().add(worker);
+        labWork.setId(id);
+        getCollection().add(labWork);
     }
 
-    public Worker getByID(Integer id){
+    public LabWork getByID(Integer id){
         assertNotEmpty();
-        Optional<Worker> worker = getCollection().stream()
+        Optional<LabWork> labWork = getCollection().stream()
                 .filter(w -> w.getId() == id)
                 .findFirst();
-        if(!worker.isPresent()){
+        if(!labWork.isPresent()){
             throw new NoSuchIdException(id);
         }
-        return worker.get();
+        return labWork.get();
     }
-    protected void addWithoutIdGeneration(Worker worker){
+    protected void addWithoutIdGeneration(LabWork worker){
         getUniqueIds().add(worker.getId());
         getCollection().add(worker);
     }
@@ -86,7 +82,7 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
         Iterator<Integer> iterator = ids.iterator();
         while (iterator.hasNext()){
             Integer id = iterator.next();
-            getCollection().removeIf(worker -> worker.getId()==id);
+            getCollection().removeIf(labWork -> labWork.getId()==id);
             iterator.remove();
         }
     }
@@ -97,7 +93,7 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
      * @return Information
      */
     public String getInfo() {
-        return "[DatabaseInfo] Database of Worker, size: [" + getCollection().size() + "] ; initialization date: [" + initDate.toString()+"]";
+        return "[DatabaseInfo] Database of LabWork, size: [" + getCollection().size() + "] ; initialization date: [" + initDate.toString()+"]";
     }
 
     /**
@@ -121,7 +117,7 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
 
     public void removeByID(Integer id) {
         assertNotEmpty();
-        Optional<Worker> worker = getCollection().stream()
+        Optional<LabWork> worker = getCollection().stream()
                 .filter(w -> w.getId() == id)
                 .findFirst();
         if(!worker.isPresent()){
@@ -136,17 +132,17 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
      *
      * @param id ID
      */
-    public void updateByID(Integer id, Worker newWorker) {
+    public void updateByID(Integer id, LabWork newLabWork) {
         assertNotEmpty();
-        Optional<Worker> worker = getCollection().stream()
+        Optional<LabWork> labWork = getCollection().stream()
                 .filter(w -> w.getId() == id)
                 .findFirst();
-        if (!worker.isPresent()) {
+        if (!labWork.isPresent()) {
             throw new NoSuchIdException(id);
         }
-        getCollection().remove(worker.get());
-        newWorker.setId(id);
-        getCollection().add(newWorker);
+        getCollection().remove(labWork.get());
+        newLabWork.setId(id);
+        getCollection().add(newLabWork);
 
     }
 
@@ -167,7 +163,7 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
 
     public void removeFirst() {
         assertNotEmpty();
-        Iterator<Worker> it =  getCollection().iterator();
+        Iterator<LabWork> it =  getCollection().iterator();
         int id = it.next().getId();
         it.remove();
         getUniqueIds().remove(id);
@@ -178,14 +174,14 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
      *
      * @param worker Element
      */
-    public void addIfMax(Worker worker) {
+    public void addIfMax(LabWork labWork) {
         if (getCollection().stream()
-                .max(Worker::compareTo)
-                .filter(w -> w.compareTo(worker) == 1)
+                .max(LabWork::compareTo)
+                .filter(w -> w.compareTo(labWork) == 1)
                 .isPresent()) {
             throw new CannotAddException();
         }
-        add(worker);
+        add(labWork);
     }
 
     /**
@@ -193,49 +189,25 @@ public abstract class WorkerManagerImpl<T extends Collection<Worker>> implements
      *
      * @param worker Element
      */
-    public void addIfMin(Worker worker) {
+    public void addIfMin(LabWork labWork) {
         if (getCollection().stream()
-                .min(Worker::compareTo)
-                .filter(w -> w.compareTo(worker) < 0)
+                .min(LabWork::compareTo)
+                .filter(w -> w.compareTo(labWork) < 0)
                 .isPresent()) {
             throw new CannotAddException();
         }
-        add(worker);
+        add(labWork);
     }
 
-    public List<Worker> filterStartsWithName(String start) {
+    public List<LabWork> filterStartsWithName(String start) {
         assertNotEmpty();
         return getCollection().stream()
                 .filter(w -> w.getName().startsWith(start.trim()))
                 .collect(Collectors.toList());
     }
 
-    public Map<LocalDate, Integer> groupByEndDate() {
-        assertNotEmpty();
-        HashMap<LocalDate, Integer> map = new HashMap<>();
-        getCollection().stream()
-                .filter((worker -> worker.getEndDate() != null))
-                .forEach((worker) -> {
-                    LocalDate endDate = worker.getEndDate();
-                    if (map.containsKey(endDate)) {
-                        Integer q = map.get(endDate);
-                        map.replace(endDate, q + 1);
-                    } else {
-                        map.put(endDate, 1);
-                    }
-                });
-        return map;
-    }
 
-    public List<Long> getUniqueSalaries() {
-        assertNotEmpty();
-        List<Long> salaries = new LinkedList<>();
-        salaries = getCollection().stream()
-                .map(Worker::getSalary)
-                .distinct()
-                .collect(Collectors.toList());
-        return salaries;
-    }
+
 
 
     @Override

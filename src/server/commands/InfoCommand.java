@@ -1,14 +1,13 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
-import common.exceptions.InvalidDataException;
 
 public class InfoCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public InfoCommand(WorkerManager cm) {
+    public InfoCommand(LabWorkManager cm) {
         super("info", CommandType.NORMAL);
         collectionManager = cm;//TODO
     }

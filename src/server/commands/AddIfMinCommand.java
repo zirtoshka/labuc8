@@ -1,14 +1,14 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 import common.connection.CollectionOperation;
 
 public class AddIfMinCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public AddIfMinCommand(WorkerManager cm) {
+    public AddIfMinCommand(LabWorkManager cm) {
         super("add_if_min", CommandType.NORMAL, CollectionOperation.ADD);
         collectionManager = cm;
     }

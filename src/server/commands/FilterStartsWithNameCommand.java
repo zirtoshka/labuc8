@@ -1,6 +1,6 @@
 package server.commands;
 
-import common.collection.WorkerManager;
+import common.collection.LabWorkManager;
 import common.commands.CommandImpl;
 import common.commands.CommandType;
 import common.data.Worker;
@@ -9,9 +9,9 @@ import common.exceptions.MissedCommandArgumentException;
 import java.util.List;
 
 public class FilterStartsWithNameCommand extends CommandImpl {
-    private final WorkerManager collectionManager;
+    private final LabWorkManager collectionManager;
 
-    public FilterStartsWithNameCommand(WorkerManager cm) {
+    public FilterStartsWithNameCommand(LabWorkManager cm) {
         super("filter_starts_with_name", CommandType.NORMAL);
         collectionManager = cm;
     }
