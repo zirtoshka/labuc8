@@ -320,7 +320,7 @@ public class Client extends Thread implements SenderReceiver {
     public boolean isAuthSuccess(){
         return authSuccess;
     }
-    public LabWorkObservableManager getWorkerManager(){
+    public LabWorkObservableManager getLabWorkManager(){
         return collectionManager;
     }
     public ClientCommandManager getCommandManager(){return commandManager;}

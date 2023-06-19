@@ -26,7 +26,7 @@ public class GroupCountingByEndDateCommand extends CommandImpl {
 
     @Override
     public String execute() {
-        Map<LocalDate, Integer> map = client.getWorkerManager().groupByEndDate();
+        Map<LocalDate, Integer> map = client.getLabWorkManager().groupByEndDate();
         if (map.isEmpty()) return "none of the elements have endDate field";
 
 

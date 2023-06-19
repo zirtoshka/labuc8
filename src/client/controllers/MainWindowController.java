@@ -22,10 +22,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
-import javafx.stage.StageStyle;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -42,7 +40,6 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -251,7 +248,7 @@ public class MainWindowController {
     }
 
     public void initFilter() {
-        tableFilter = new TableFilter<LabWork>(LabWorkTable, client.getWorkerManager().getCollection(), resourceFactory)
+        tableFilter = new TableFilter<LabWork>(LabWorkTable, client.getLabWorkManager().getCollection(), resourceFactory)
                 .addFilter(idColumn, (w) -> Integer.toString(w.getId()))
                 .addFilter(nameColumn, (w) -> w.getName())
                 .addFilter(coordinatesXColumn, (w) -> Double.toString(w.getCoordinates().getX()))
@@ -265,11 +262,11 @@ public class MainWindowController {
                 .addFilter(ownerColumn, (w) -> w.getUserLogin());
     }
 
-    public TableFilter<Worker> getFilter() {
+    public TableFilter<LabWork> getFilter() {
         return tableFilter;
     }
 
-    public TableColumn<Worker, ?> getNameColumn() {
+    public TableColumn<LabWork, ?> getNameColumn() {
         return nameColumn;
     }
 
@@ -327,12 +324,18 @@ public class MainWindowController {
         nameColumn.textProperty().bind(resourceFactory.getStringBinding("NameColumn"));
         coordinatesXColumn.textProperty().bind(resourceFactory.getStringBinding("CoordinatesXColumn"));
         coordinatesYColumn.textProperty().bind(resourceFactory.getStringBinding("CoordinatesYColumn"));
-        salaryColumn.textProperty().bind(resourceFactory.getStringBinding("SalaryColumn"));
-        endDateColumn.textProperty().bind(resourceFactory.getStringBinding("EndDateColumn"));
-        positionColumn.textProperty().bind(resourceFactory.getStringBinding("PositionColumn"));
-        statusColumn.textProperty().bind(resourceFactory.getStringBinding("StatusColumn"));
-        organizationNameColumn.textProperty().bind(resourceFactory.getStringBinding("OrganizationNameColumn"));
-        organizationTypeColumn.textProperty().bind(resourceFactory.getStringBinding("OrganizationTypeColumn"));
+        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
+
+        personalQualitiesMinimumColumn.textProperty().bind(resourceFactory.getStringBinding("PersonalQualitiesMinimumColumn"));
+
+        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
+
+        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
+
+        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
+
+        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
+
 
         tableTab.textProperty().bind(resourceFactory.getStringBinding("TableTab"));
         canvasTab.textProperty().bind(resourceFactory.getStringBinding("CanvasTab"));
@@ -682,8 +685,8 @@ public class MainWindowController {
 
     public void setClient(Client client) {
         this.client = client;
-        workerTable.setItems(client.getWorkerManager().getCollection());
-        client.getWorkerManager().setController(this);
+        workerTable.setItems(client.getLabWorkManager().getCollection());
+        client.getLabWorkManager().setController(this);
         client.setResourceFactory(resourceFactory);
     }
 

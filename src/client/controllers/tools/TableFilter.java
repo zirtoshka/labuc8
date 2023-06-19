@@ -1,15 +1,12 @@
 package client.controllers.tools;
 
+import common.data.LabWork;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.Style;
 import javafx.scene.control.*;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,7 +17,7 @@ public class TableFilter <T>{
     private ObservableList<T> list;
     private Map<TableColumn<T,?>, FilterArg> columnsFilters;
     //private Converter<T> converter;
-    public TableFilter(TableView<T> tab, ObservableList<T> l, ObservableResourceFactory res){
+    public TableFilter(TableView<LabWork> tab, ObservableList<Worker> l, ObservableResourceFactory res){
         table = tab;
         list = l;
         resourceFactory = res;
