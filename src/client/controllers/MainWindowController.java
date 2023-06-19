@@ -62,7 +62,7 @@ public class MainWindowController {
 
     private final long RANDOM_SEED = 1821L;
     private final Duration ANIMATION_DURATION = Duration.millis(800);
-    private final double MAX_SIZE = 250;
+    private final double MAX_SIZE = 100;
 
     @FXML
     private TableView<LabWork> LabWorkTable;
@@ -325,16 +325,11 @@ public class MainWindowController {
         coordinatesXColumn.textProperty().bind(resourceFactory.getStringBinding("CoordinatesXColumn"));
         coordinatesYColumn.textProperty().bind(resourceFactory.getStringBinding("CoordinatesYColumn"));
         minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
-
         personalQualitiesMinimumColumn.textProperty().bind(resourceFactory.getStringBinding("PersonalQualitiesMinimumColumn"));
-
-        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
-
-        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
-
-        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
-
-        minimalPointColumn.textProperty().bind(resourceFactory.getStringBinding("MinimalPointColumn"));
+        averagePointColumn.textProperty().bind(resourceFactory.getStringBinding("AveragePointColumn"));
+        difficultyColumn.textProperty().bind(resourceFactory.getStringBinding("DifficultyColumn"));
+        nameDisciplineColumn.textProperty().bind(resourceFactory.getStringBinding("NameDisciplineColumn"));
+        lectureHoursDisciplineColumn.textProperty().bind(resourceFactory.getStringBinding("LectureHoursDisciplineColumn"));
 
 
         tableTab.textProperty().bind(resourceFactory.getStringBinding("TableTab"));
@@ -398,13 +393,13 @@ public class MainWindowController {
         }
         workerTable.getItems().add(worker);
 */
-        Worker worker = workerTable.getSelectionModel().getSelectedItem();
+        LabWork labWork = LabWorkTable.getSelectionModel().getSelectedItem();
         // int idx = workerTable.getSelectionModel().getSelectedIndex() + 1;
         //int i = workerTable.getSelectionModel().getSelectedIndex();
-        if (worker != null) {
-            askWindowController.setWorker(worker);
+        if (labWork != null) {
+            askWindowController.setWorker(labWork);
             try {
-                client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(worker.getId())).setWorker(askWindowController.readWorker()));
+                client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(labWork.getId())).setWorker(askWindowController.readWorker()));
             } catch (InvalidDataException e) {
                 //e.printStackTrace();
             }
@@ -426,9 +421,9 @@ public class MainWindowController {
      */
     @FXML
     private void removeButtonOnAction() {
-        Worker worker = workerTable.getSelectionModel().getSelectedItem();
-        if (worker != null)
-            client.getCommandManager().runCommand(new CommandMsg("remove_by_id").setArgument(Integer.toString(worker.getId())));
+        LabWork labWork = LabWorkTable.getSelectionModel().getSelectedItem();
+        if (labWork != null)
+            client.getCommandManager().runCommand(new CommandMsg("remove_by_id").setArgument(Integer.toString(labWork.getId())));
         /*if (!spaceMarineTable.getSelectionModel().isEmpty())
             requestAction(REMOVE_COMMAND_NAME,
                     spaceMarineTable.getSelectionModel().getSelectedItem().getId().toString(), null);
@@ -480,9 +475,9 @@ public class MainWindowController {
     @FXML
     private void addIfMinButtonOnAction() {
         try {
-            Worker worker = askWindowController.readWorker();
-            if (worker != null) {
-                client.getCommandManager().runCommand(new CommandMsg("add_if_min").setWorker(worker));
+            LabWork labWork = askWindowController.readWorker();
+            if (labWork != null) {
+                client.getCommandManager().runCommand(new CommandMsg("add_if_min").setWorker(labWork));
                 /*workerTable.refresh();
                 refreshCanvas();*/
             }
@@ -495,9 +490,9 @@ public class MainWindowController {
     @FXML
     private void addIfMaxButtonOnAction() {
         try {
-            Worker worker = askWindowController.readWorker();
-            if (worker != null) {
-                client.getCommandManager().runCommand(new CommandMsg("add_if_max").setWorker(worker));
+            LabWork labWork = askWindowController.readWorker();
+            if (labWork != null) {
+                client.getCommandManager().runCommand(new CommandMsg("add_if_max").setWorker(labWork));
                 /*workerTable.refresh();
                 refreshCanvas();*/
             }
@@ -600,7 +595,7 @@ public class MainWindowController {
 
 
     public void refreshTable() {
-        workerTable.refresh();
+        LabWorkTable.refresh();
         tableFilter.updateFilters();
     }
 
@@ -613,32 +608,32 @@ public class MainWindowController {
         shapeMap.clear();
         textMap.values().forEach(s -> canvasPane.getChildren().remove(s));
         textMap.clear();
-        SortedList<Worker> list = workerTable.getItems().sorted((w1, w2) -> w1.getSalary() > w2.getSalary() ? 0 : 1);
-        for (Worker worker : list) {
-            if (!userColorMap.containsKey(worker.getUserLogin()))
-                userColorMap.put(worker.getUserLogin(),
+        SortedList<LabWork> list = LabWorkTable.getItems().sorted((w1, w2) -> w1.getName().compareTo(w2.getName()) > 0 ? 0 : 1);
+        for (LabWork labWork : list) {
+            if (!userColorMap.containsKey(labWork.getUserLogin()))
+                userColorMap.put(labWork.getUserLogin(),
                         Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
 
-            double size = Math.min(worker.getSalary() / 1000, MAX_SIZE);
+            double size = MAX_SIZE;
 
-            Shape circleObject = new Circle(size, userColorMap.get(worker.getUserLogin()));
+            Shape circleObject = new Circle(size, userColorMap.get(labWork.getUserLogin()));
             circleObject.setOnMouseClicked(this::shapeOnMouseClicked);
-            circleObject.translateXProperty().bind(canvasPane.widthProperty().divide(2).add(worker.getCoordinates().getX()));
-            circleObject.translateYProperty().bind(canvasPane.heightProperty().divide(2).subtract(worker.getCoordinates().getY()));
+            circleObject.translateXProperty().bind(canvasPane.widthProperty().divide(2).add(labWork.getCoordinates().getX()));
+            circleObject.translateYProperty().bind(canvasPane.heightProperty().divide(2).subtract(labWork.getCoordinates().getY()));
 
             circleObject.setOpacity(0.5);
 
-            Text textObject = new Text(Integer.toString(worker.getId()));
+            Text textObject = new Text(Integer.toString(labWork.getId()));
             textObject.setOnMouseClicked(circleObject::fireEvent);
             textObject.setFont(Font.font(size / 3));
-            textObject.setFill(userColorMap.get(worker.getUserLogin()).darker());
+            textObject.setFill(userColorMap.get(labWork.getUserLogin()).darker());
             textObject.translateXProperty().bind(circleObject.translateXProperty().subtract(textObject.getLayoutBounds().getWidth() / 2));
             textObject.translateYProperty().bind(circleObject.translateYProperty().add(textObject.getLayoutBounds().getHeight() / 4));
 
             canvasPane.getChildren().add(circleObject);
             canvasPane.getChildren().add(textObject);
-            shapeMap.put(circleObject, worker.getId());
-            textMap.put(worker.getId(), textObject);
+            shapeMap.put(circleObject, labWork.getId());
+            textMap.put(labWork.getId(), textObject);
 
             ScaleTransition circleAnimation = new ScaleTransition(ANIMATION_DURATION, circleObject);
             ScaleTransition textAnimation = new ScaleTransition(ANIMATION_DURATION, textObject);
@@ -663,13 +658,13 @@ public class MainWindowController {
         Shape shape = (Shape) event.getSource();
         //Tooltip.install(shape,shapeTooltip);
         long id = shapeMap.get(shape);
-        for (Worker worker : workerTable.getItems()) {
+        for (LabWork worker : LabWorkTable.getItems()) {
             if (worker.getId() == id) {
                 if (shapeTooltip != null && shapeTooltip.isShowing()) shapeTooltip.hide();
                 shapeTooltip = new Tooltip(worker.toString());
                 shapeTooltip.setAutoHide(true);
                 shapeTooltip.show(shape, event.getScreenX(), event.getScreenY());
-                workerTable.getSelectionModel().select(worker);
+                LabWorkTable.getSelectionModel().select(worker);
                 //shapeTooltip.setText(worker.toString());
                 //shapeTooltip.show(primaryStage);
                 break;
@@ -685,7 +680,7 @@ public class MainWindowController {
 
     public void setClient(Client client) {
         this.client = client;
-        workerTable.setItems(client.getLabWorkManager().getCollection());
+        LabWorkTable.setItems(client.getLabWorkManager().getCollection());
         client.getLabWorkManager().setController(this);
         client.setResourceFactory(resourceFactory);
     }
@@ -728,7 +723,7 @@ public class MainWindowController {
             }
 
             System.out.println(locale);
-            workerTable.refresh();
+            LabWorkTable.refresh();
         });
         bindGuiLanguage();
     }
