@@ -2,11 +2,8 @@ package client.controllers;
 
 import client.controllers.tools.ObservableResourceFactory;
 import client.main.App;
-import common.auth.User;
-import common.connection.CommandMsg;
 import common.data.*;
 import common.exceptions.*;
-import common.io.InputManager;
 import common.utils.DateConverter;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -17,10 +14,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 
+import javax.swing.text.Position;
 import java.time.LocalDate;
-import java.util.Scanner;
-
-import static common.utils.DateConverter.parseLocalDate;
 
 public class AskWindowController {
     @FXML
@@ -29,19 +24,23 @@ public class AskWindowController {
     private Label coordinatesXLabel;
     @FXML
     private Label coordinatesYLabel;
-    @FXML
-    private Label salaryLabel;
 
     @FXML
-    private Label endDateLabel;
+    private Label minimalPointLabel;
     @FXML
-    private Label positionLabel;
+    private Label personalQualitiesMinimumLabel;
     @FXML
-    private Label statusLabel;
+    private Label difficultyLabel;
     @FXML
-    private Label organizationNameLabel;
+    private Label averagePointLabel;
+
     @FXML
-    private Label organizationTypeLabel;
+    private Label nameDisciplineLabel;
+    @FXML
+    private Label lectureHoursDisciplineLabel;
+
+
+
     @FXML
     private TextField nameField;
     @FXML
@@ -49,156 +48,165 @@ public class AskWindowController {
     @FXML
     private TextField coordinatesYField;
     @FXML
-    private TextField salaryField;
+    private TextField minimalPointField;
     @FXML
-    private TextField endDateField;
+    private TextField personalQualitiesMinimumField;
     @FXML
-    private TextField organizationNameField;
+    private TextField nameDisciplineField;
     @FXML
-    private ComboBox<Position> positionBox;
+    private TextField averagePointField;
+
     @FXML
-    private ComboBox<Status> statusBox;
+    private TextField lectureHoursDisciplineField;
     @FXML
-    private ComboBox<OrganizationType> organizationTypeBox;
+    private ComboBox<Difficulty> difficultyBox;
+
 
     @FXML
     private Button enterButton;
 
     private Stage askStage;
-    private Worker resultWorker;
+    private LabWork resultLabWork;
     private ObservableResourceFactory resourceFactory;
-    private Worker worker;
+    private LabWork labWork;
     private App app;
+
     @FXML
     public void initialize() {
         askStage = new Stage();
-        positionBox.setItems(FXCollections.observableArrayList(Position.values()));
-        statusBox.setItems(FXCollections.observableArrayList(Status.values()));
-        organizationTypeBox.setItems(FXCollections.observableArrayList(OrganizationType.values()));
+        difficultyBox.setItems(FXCollections.observableArrayList(Difficulty.values()));
     }
 
     public String readName() throws InvalidDataException {
         String s = nameField.getText();
-        if (s==null||s.equals("")) {
+        if (s == null || s.equals("")) {
             throw new InvalidDataException("[NameEmptyException]");
         }
         return s;
     }
 
-    public String readFullName() {
-        String s = organizationNameField.getText();
-        if (s==null||s.equals("")) {
-            return null;
-        }
-        return s;
-    }
 
-    public float readXCoord() throws InvalidDataException {
-        float x;
+
+    public double readXCoord() throws InvalidDataException {
+        double x;
         try {
             x = Float.parseFloat(coordinatesXField.getText());
         } catch (NumberFormatException e) {
             throw new InvalidDataException("[XCoordFormatException]");
         }
-        if (Float.isInfinite(x) || Float.isNaN(x)) throw new InvalidDataException("[XCoordFormatException]");
+        if (Double.isInfinite(x) || Double.isNaN(x)) throw new InvalidDataException("[XCoordFormatException]");
         return x;
     }
 
-    public Long readYCoord() throws InvalidDataException {
-        Long y;
+    public Integer readYCoord() throws InvalidDataException {
+        Integer y;
         try {
-            y = Long.parseLong(coordinatesYField.getText());
+            y = Integer.parseInt(coordinatesYField.getText());
         } catch (NumberFormatException e) {
             throw new InvalidDataException("[YCoordFormatException]");
         }
-        if (y <= -123) throw new InvalidDataException("[YCoordLimitException]");
+        if (y <= -545) throw new InvalidDataException("[YCoordLimitException]");
         return y;
     }
 
     public Coordinates readCoords() throws InvalidDataException {
-        float x = readXCoord();
-        Long y = readYCoord();
+        double x = readXCoord();
+        Integer y = readYCoord();
         Coordinates coord = new Coordinates(x, y);
         return coord;
     }
 
-    public long readSalary() throws InvalidDataException {
-        Long s;
-        try {
-            s = Long.parseLong(salaryField.getText());
-        } catch (NumberFormatException e) {
-            throw new InvalidDataException("[SalaryFormatException]");
+    public Integer readMinimalPoint() throws InvalidNumberException {
+        Integer minimalPoint;
+        try{
+            minimalPoint = Integer.parseInt(minimalPointField.getText());
+            if (minimalPoint <= 0) throw new InvalidNumberException();
         }
-
-        if (s <= 0) throw new InvalidNumberException("[SalaryLimitException]");
-
-        return s;
-    }
-
-    public LocalDate readEndDate() throws InvalidDataException {
-        String buf = endDateField.getText();
-        if (buf==null||buf.equals("")) {
-            return null;
-        } else {
-            try {
-                return parseLocalDate(buf);
-            } catch (InvalidDateFormatException e){
-                throw new InvalidDataException("[EndDateFormatException]");
-            }
+        catch(NumberFormatException e){
+            throw new InvalidNumberException();
         }
+        return minimalPoint;
     }
 
-    public Position readPosition() {
-        return  positionBox.getSelectionModel().getSelectedItem();
+    public int readPersonalQualitiesMinimum() throws InvalidNumberException {
+        int personalQualitiesMinimum;
+        try{
+            personalQualitiesMinimum = Integer.parseInt(personalQualitiesMinimumField.getText());
+            if (personalQualitiesMinimum <= 0) throw new InvalidNumberException();
+        }
+        catch(NumberFormatException e){
+            throw new InvalidNumberException();
+        }
+        return personalQualitiesMinimum;
     }
 
-    public Status readStatus() {
-        return statusBox.getSelectionModel().getSelectedItem();
+    public Double readAveragePoint() throws InvalidNumberException {
+        Double averagePoint;
+        try{
+            averagePoint = Double.parseDouble(averagePointField.getText());
+            if (averagePoint != null && (averagePoint <= 0)) throw new InvalidNumberException();
+        }
+        catch(NumberFormatException e){
+            throw new InvalidNumberException();
+        }
+        return averagePoint;
     }
 
-    public OrganizationType readOrganizationType() throws InvalidEnumException {
-       return organizationTypeBox.getSelectionModel().getSelectedItem();
+    public Difficulty readDifficulty() {
+        return  difficultyBox.getSelectionModel().getSelectedItem();
+    }
+    public Integer readLectureHours() throws InvalidNumberException {
+        Integer lectureHours;
+        try{
+            lectureHours = Integer.parseInt(lectureHoursDisciplineField.getText());
+        }
+        catch(NumberFormatException e){
+            throw new InvalidNumberException();
+        }
+        return lectureHours;
+    }
+    public Discipline readDiscipline() throws InvalidDataException{
+        String name = readName();
+        Integer lectureHours = readLectureHours();
+        return new Discipline(name, lectureHours);
     }
 
-    public Organization readOrganization() throws InvalidDataException {
-        String fullName = readFullName();
-        OrganizationType orgType = readOrganizationType();
-        return new Organization(fullName, orgType);
-    }
 
-    public Worker readWorker() throws InvalidDataException {
+
+
+    public LabWork readLabWork() throws InvalidDataException {
         askStage.showAndWait();
 
-        if(worker==null) throw new InvalidDataException("");
-        return worker;
+        if (labWork == null) throw new InvalidDataException("");
+        return labWork;
 
     }
-    public void setWorker(Worker worker) {
-        nameField.setText(worker.getName());
-        coordinatesXField.setText(worker.getCoordinates().getX() + "");
-        coordinatesYField.setText(worker.getCoordinates().getY() + "");
-        salaryField.setText(worker.getSalary() + "");
-        organizationNameField.setText(worker.getOrganization().getFullName()!=null?worker.getOrganization().getFullName():"");
-        endDateField.setText(worker.getEndDate()!=null? DateConverter.dateToString(worker.getEndDate()):"");
-        positionBox.setValue(worker.getPosition());
-        statusBox.setValue(worker.getStatus());
-        organizationTypeBox.setValue(worker.getOrganization().getType());
+
+    public void setLabWork(LabWork labWork) {
+        nameField.setText(labWork.getName());
+        coordinatesXField.setText(labWork.getCoordinates().getX() + "");
+        coordinatesYField.setText(labWork.getCoordinates().getY() + "");
+        salaryField.setText(labWork.getDifficulty() + "");
+        organizationNameField.setText(worker.getOrganization().getFullName() != null ? worker.getOrganization().getFullName() : "");
+        endDateField.setText(worker.getEndDate() != null ? DateConverter.dateToString(worker.getEndDate()) : "");
+        difficultyBox.setValue(labWork.getDifficulty());
     }
+
     @FXML
     private void enterButtonOnAction() {
         try {
 
             String name = readName();
             Coordinates coords = readCoords();
-            long salary = readSalary();
+            long salary = readDifficulty();
             LocalDate date = readEndDate();
-            Position pos = readPosition();
+            Position pos = readDifficulty();
             Status stat = readStatus();
             Organization org = readOrganization();
             worker = new DefaultWorker(name, coords, salary, date, pos, stat, org);
 
             askStage.close();
-        } catch (InvalidDataException|IllegalArgumentException exception) {
+        } catch (InvalidDataException | IllegalArgumentException exception) {
             app.getOutputManager().error(exception.getMessage());
         }
     }
@@ -246,7 +254,7 @@ public class AskWindowController {
 
     public void setAskStage(Stage askStage) {
         this.askStage = askStage;
-        this.askStage.setOnCloseRequest((e)->worker=null);
+        this.askStage.setOnCloseRequest((e) -> worker = null);
     }
 
     public void setApp(App app) {
@@ -263,7 +271,7 @@ public class AskWindowController {
         bindGuiLanguage();
     }
 
-    public void bindGuiLanguage(){
+    public void bindGuiLanguage() {
         nameLabel.textProperty().bind(resourceFactory.getStringBinding("NameColumn"));
         coordinatesXLabel.textProperty().bind(resourceFactory.getStringBinding("CoordinatesXColumn"));
         coordinatesYLabel.textProperty().bind(resourceFactory.getStringBinding("CoordinatesYColumn"));

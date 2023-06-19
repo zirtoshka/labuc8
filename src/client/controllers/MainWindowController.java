@@ -397,9 +397,9 @@ public class MainWindowController {
         // int idx = workerTable.getSelectionModel().getSelectedIndex() + 1;
         //int i = workerTable.getSelectionModel().getSelectedIndex();
         if (labWork != null) {
-            askWindowController.setWorker(labWork);
+            askWindowController.setLabWork(labWork);
             try {
-                client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(labWork.getId())).setWorker(askWindowController.readWorker()));
+                client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(labWork.getId())).setWorker(askWindowController.readLabWork()));
             } catch (InvalidDataException e) {
                 //e.printStackTrace();
             }
@@ -460,7 +460,7 @@ public class MainWindowController {
         //askWindowController.clearMarine();
 
         try {
-            client.getCommandManager().runCommand(new CommandMsg("add").setWorker(askWindowController.readWorker()));
+            client.getCommandManager().runCommand(new CommandMsg("add").setWorker(askWindowController.readLabWork()));
         } catch (InvalidDataException e) {
 
         }
@@ -475,7 +475,7 @@ public class MainWindowController {
     @FXML
     private void addIfMinButtonOnAction() {
         try {
-            LabWork labWork = askWindowController.readWorker();
+            LabWork labWork = askWindowController.readLabWork();
             if (labWork != null) {
                 client.getCommandManager().runCommand(new CommandMsg("add_if_min").setWorker(labWork));
                 /*workerTable.refresh();
@@ -490,7 +490,7 @@ public class MainWindowController {
     @FXML
     private void addIfMaxButtonOnAction() {
         try {
-            LabWork labWork = askWindowController.readWorker();
+            LabWork labWork = askWindowController.readLabWork();
             if (labWork != null) {
                 client.getCommandManager().runCommand(new CommandMsg("add_if_max").setWorker(labWork));
                 /*workerTable.refresh();
