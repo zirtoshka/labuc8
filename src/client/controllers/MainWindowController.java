@@ -68,31 +68,36 @@ public class MainWindowController {
     private final double MAX_SIZE = 250;
 
     @FXML
-    private TableView<Worker> workerTable;
+    private TableView<LabWork> LabWorkTable;
     @FXML
-    private TableColumn<Worker, Integer> idColumn;
+    private TableColumn<LabWork, Integer> idColumn;
     @FXML
-    private TableColumn<Worker, String> ownerColumn;
+    private TableColumn<LabWork, String> ownerColumn;
     @FXML
-    private TableColumn<Worker, Date> creationDateColumn;
+    private TableColumn<LabWork, Date> creationDateColumn;
     @FXML
-    private TableColumn<Worker, LocalDate> endDateColumn;
+    private TableColumn<LabWork, String> nameColumn;
+
     @FXML
-    private TableColumn<Worker, String> nameColumn;
+    private TableColumn<LabWork, Double> coordinatesXColumn;
     @FXML
-    private TableColumn<Worker, Long> salaryColumn;
+    private TableColumn<LabWork, Integer> coordinatesYColumn;
     @FXML
-    private TableColumn<Worker, Float> coordinatesXColumn;
+    private TableColumn<LabWork, Integer> minimalPointColumn;
+
     @FXML
-    private TableColumn<Worker, Long> coordinatesYColumn;
+    private TableColumn<LabWork, Integer> personalQualitiesMinimumColumn;
+
     @FXML
-    private TableColumn<Worker, Position> positionColumn;
+    private TableColumn<LabWork, Double> averagePointColumn;
+
     @FXML
-    private TableColumn<Worker, Status> statusColumn;
+    private TableColumn<LabWork, Difficulty> difficultyColumn;
     @FXML
-    private TableColumn<Worker, String> organizationNameColumn;
+    private TableColumn<Discipline, String> nameDisciplineColumn;
+
     @FXML
-    private TableColumn<Worker, OrganizationType> organizationTypeColumn;
+    private TableColumn<Discipline, Integer> lectureHoursDisciplineColumn;
     @FXML
     private AnchorPane canvasPane;
     @FXML
@@ -154,7 +159,7 @@ public class MainWindowController {
 
     private App app;
     private Tooltip shapeTooltip;
-    private TableFilter<Worker> tableFilter;
+    private TableFilter<LabWork> tableFilter;
     private Client client;
     private Stage askStage;
     private Stage primaryStage;
@@ -202,32 +207,31 @@ public class MainWindowController {
                 new ReadOnlyObjectWrapper<>(cellData.getValue().getCreationDate()));
         nameColumn.setCellValueFactory(cellData ->
                 new ReadOnlyObjectWrapper<>(cellData.getValue().getName()));
-        salaryColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getSalary()));
         coordinatesXColumn.setCellValueFactory(cellData ->
                 new ReadOnlyObjectWrapper<>(cellData.getValue().getCoordinates().getX()));
         coordinatesYColumn.setCellValueFactory(cellData ->
                 new ReadOnlyObjectWrapper<>(cellData.getValue().getCoordinates().getY()));
-        statusColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getStatus()));
-        positionColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getPosition()));
-        endDateColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getEndDate()));
-        organizationNameColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getOrganization().getFullName()));
-        organizationTypeColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getOrganization().getType()));
+        minimalPointColumn.setCellValueFactory(cellData ->
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getMinimalPoint()));
+        personalQualitiesMinimumColumn.setCellValueFactory(cellData ->
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getPersonalQualitiesMinimum()));
+        averagePointColumn.setCellValueFactory(cellData ->
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getAveragePoint()));
+        difficultyColumn.setCellValueFactory(cellData ->
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getDifficulty()));
+        nameDisciplineColumn.setCellValueFactory(cellData ->
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getName()));
+        lectureHoursDisciplineColumn.setCellValueFactory(cellData ->
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getLectureHours()));
 
         creationDateColumn.setCellFactory(column -> {
-            TableCell<Worker, Date> cell = new TableCell<Worker, Date>() {
+            TableCell<LabWork, Date> cell = new TableCell<LabWork, Date>() {
                 @Override
                 protected void updateItem(Date item, boolean empty) {
                     super.updateItem(item, empty);
-                    if(empty) {
+                    if (empty) {
                         setText(null);
-                    }
-                    else {
+                    } else {
                         setText(DateConverter.dateToString(item));
                     }
                 }
@@ -235,25 +239,10 @@ public class MainWindowController {
 
             return cell;
         });
-        endDateColumn.setCellFactory(column -> {
-            TableCell<Worker, LocalDate> cell = new TableCell<Worker, LocalDate>() {
-                @Override
-                protected void updateItem(LocalDate item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if(empty) {
-                        setText(null);
-                    }
-                    else {
-                        setText(DateConverter.dateToString(item));
-                    }
-                }
-            };
 
-            return cell;
-        });
 
         //workerTable.setItems(FXCollections.observableArrayList());
-       //s TableFilter<Worker> tableFilter = TableFilter.forTableView(workerTable).apply();
+        //s TableFilter<Worker> tableFilter = TableFilter.forTableView(workerTable).apply();
         /*workerTable.setOnSort((e)->{
             workerTable.getSortOrder().stream().sorted().collect();
         });*/
@@ -261,30 +250,30 @@ public class MainWindowController {
 
     }
 
-    public void initFilter(){
-        tableFilter = new TableFilter<Worker>(workerTable,client.getWorkerManager().getCollection(),resourceFactory)
-                .addFilter(idColumn, (w)->Integer.toString(w.getId()))
-                .addFilter(nameColumn, (w)->w.getName())
-                .addFilter(coordinatesXColumn, (w)->Float.toString(w.getCoordinates().getX()))
-                .addFilter(coordinatesYColumn, (w)->Long.toString(w.getCoordinates().getY()))
-                .addFilter(creationDateColumn, (w)-> DateConverter.dateToString(w.getCreationDate()))
-                .addFilter(endDateColumn, (w)->DateConverter.dateToString(w.getEndDate()))
-                .addFilter(positionColumn, (w)->w.getPosition().toString())
-                .addFilter(statusColumn, (w)->w.getStatus().toString())
-                .addFilter(salaryColumn, (w)->Long.toString(w.getSalary()))
-                .addFilter(organizationNameColumn, (w)->w.getOrganization().getFullName())
-                .addFilter(organizationTypeColumn, (w)->w.getOrganization().getType().toString())
-                .addFilter(ownerColumn, (w)->w.getUserLogin());
+    public void initFilter() {
+        tableFilter = new TableFilter<LabWork>(LabWorkTable, client.getWorkerManager().getCollection(), resourceFactory)
+                .addFilter(idColumn, (w) -> Integer.toString(w.getId()))
+                .addFilter(nameColumn, (w) -> w.getName())
+                .addFilter(coordinatesXColumn, (w) -> Double.toString(w.getCoordinates().getX()))
+                .addFilter(coordinatesYColumn, (w) -> Integer.toString(w.getCoordinates().getY()))
+                .addFilter(creationDateColumn, (w) -> DateConverter.dateToString(w.getCreationDate()))
+                .addFilter(minimalPointColumn, (w) -> Integer.toString(w.getMinimalPoint()) )
+                .addFilter(personalQualitiesMinimumColumn, (w) -> Integer.toString(w.getPersonalQualitiesMinimum()) )
+
+                .addFilter(minimalPointColumn, (w) -> Integer.toString(w.getMinimalPoint()) )
+
+                .addFilter(ownerColumn, (w) -> w.getUserLogin());
     }
 
-    public TableFilter<Worker> getFilter(){
+    public TableFilter<Worker> getFilter() {
         return tableFilter;
     }
-    public TableColumn<Worker,?> getNameColumn(){
+
+    public TableColumn<Worker, ?> getNameColumn() {
         return nameColumn;
     }
 
-    private void initCanvas(){
+    private void initCanvas() {
         ZoomOperator zoomOperator = new ZoomOperator();
 
 // Listen to scroll events (similarly you could listen to a button click, slider, ...)
@@ -306,7 +295,8 @@ public class MainWindowController {
                         zoomOperator.getBounds().getMinY()>=1000||
                         zoomOperator.getBounds().getMaxX()<=2000-1000||
                         zoomOperator.getBounds().getMaxY()<=2000-1000))) return;*/
-                if((event.getDeltaY()<=0 && (zoomOperator.getBounds().getHeight()<=500||zoomOperator.getBounds().getWidth()<=500))) return;
+                if ((event.getDeltaY() <= 0 && (zoomOperator.getBounds().getHeight() <= 500 || zoomOperator.getBounds().getWidth() <= 500)))
+                    return;
                 zoomOperator.zoom(canvasPane, zoomFactor, x, y);
 
 
@@ -323,6 +313,7 @@ public class MainWindowController {
         canvasPane.setMinWidth(2000);
         canvasPane.setMinHeight(2000);
     }
+
     /**
      * Bind gui language.
      */
@@ -405,9 +396,9 @@ public class MainWindowController {
         workerTable.getItems().add(worker);
 */
         Worker worker = workerTable.getSelectionModel().getSelectedItem();
-       // int idx = workerTable.getSelectionModel().getSelectedIndex() + 1;
+        // int idx = workerTable.getSelectionModel().getSelectedIndex() + 1;
         //int i = workerTable.getSelectionModel().getSelectedIndex();
-        if(worker!=null) {
+        if (worker != null) {
             askWindowController.setWorker(worker);
             try {
                 client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(worker.getId())).setWorker(askWindowController.readWorker()));
@@ -433,7 +424,8 @@ public class MainWindowController {
     @FXML
     private void removeButtonOnAction() {
         Worker worker = workerTable.getSelectionModel().getSelectedItem();
-        if(worker!=null) client.getCommandManager().runCommand(new CommandMsg("remove_by_id").setArgument(Integer.toString(worker.getId())));
+        if (worker != null)
+            client.getCommandManager().runCommand(new CommandMsg("remove_by_id").setArgument(Integer.toString(worker.getId())));
         /*if (!spaceMarineTable.getSelectionModel().isEmpty())
             requestAction(REMOVE_COMMAND_NAME,
                     spaceMarineTable.getSelectionModel().getSelectedItem().getId().toString(), null);
@@ -478,6 +470,7 @@ public class MainWindowController {
         refreshCanvas();*/
         //if (marineRaw != null) requestAction(ADD_COMMAND_NAME, "", marineRaw);*/
     }
+
     /**
      * Add if min button on action.
      */
@@ -485,7 +478,7 @@ public class MainWindowController {
     private void addIfMinButtonOnAction() {
         try {
             Worker worker = askWindowController.readWorker();
-            if(worker!=null) {
+            if (worker != null) {
                 client.getCommandManager().runCommand(new CommandMsg("add_if_min").setWorker(worker));
                 /*workerTable.refresh();
                 refreshCanvas();*/
@@ -500,7 +493,7 @@ public class MainWindowController {
     private void addIfMaxButtonOnAction() {
         try {
             Worker worker = askWindowController.readWorker();
-            if(worker!=null) {
+            if (worker != null) {
                 client.getCommandManager().runCommand(new CommandMsg("add_if_max").setWorker(worker));
                 /*workerTable.refresh();
                 refreshCanvas();*/
@@ -539,9 +532,9 @@ public class MainWindowController {
         TextField textField = new TextField();
         Button button = new Button();
         button.textProperty().bind(resourceFactory.getStringBinding("EnterButton"));
-        button.setOnAction((e)->{
+        button.setOnAction((e) -> {
             String arg = textField.getText();
-            if(arg!=null && !arg.equals("")) {
+            if (arg != null && !arg.equals("")) {
                 client.getCommandManager().runCommand(new CommandMsg("filter_starts_with_name").setArgument(arg));
                 stage.close();
             }
@@ -550,7 +543,7 @@ public class MainWindowController {
         nameLabel.textProperty().bind(resourceFactory.getStringBinding("NameColumn"));
         button.setAlignment(Pos.CENTER);
 
-        HBox hBox = new HBox(nameLabel,textField,button);
+        HBox hBox = new HBox(nameLabel, textField, button);
         hBox.setAlignment(Pos.CENTER);
         hBox.setSpacing(10);
         Scene scene = new Scene(hBox);
@@ -560,8 +553,9 @@ public class MainWindowController {
         stage.setResizable(false);
         stage.showAndWait();
     }
+
     @FXML
-    private void helpButtonOnAction(){
+    private void helpButtonOnAction() {
         client.getCommandManager().runCommand(new CommandMsg("help"));
     }
 
@@ -579,14 +573,15 @@ public class MainWindowController {
             refreshCanvas();
         }*/
     }
-    private boolean askServer(Request request){
+
+    private boolean askServer(Request request) {
         Response response;
         try {
             client.send(request);
             response = client.receive();
-        } catch (ConnectionTimeoutException e){
+        } catch (ConnectionTimeoutException e) {
             app.getOutputManager().error("ConnectionTimeoutException");
-        }catch (InvalidDataException|ConnectionException e){
+        } catch (InvalidDataException | ConnectionException e) {
             app.getOutputManager().error("ConnectionException");
         }
         //if(response!=null)
@@ -601,10 +596,11 @@ public class MainWindowController {
     }
 
 
-    public void refreshTable(){
+    public void refreshTable() {
         workerTable.refresh();
         tableFilter.updateFilters();
     }
+
     /**
      * Refreshes canvas.
      */
@@ -614,13 +610,13 @@ public class MainWindowController {
         shapeMap.clear();
         textMap.values().forEach(s -> canvasPane.getChildren().remove(s));
         textMap.clear();
-        SortedList<Worker> list = workerTable.getItems().sorted((w1,w2)->w1.getSalary()>w2.getSalary()?0:1);
+        SortedList<Worker> list = workerTable.getItems().sorted((w1, w2) -> w1.getSalary() > w2.getSalary() ? 0 : 1);
         for (Worker worker : list) {
             if (!userColorMap.containsKey(worker.getUserLogin()))
                 userColorMap.put(worker.getUserLogin(),
                         Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
 
-            double size = Math.min(worker.getSalary()/1000, MAX_SIZE);
+            double size = Math.min(worker.getSalary() / 1000, MAX_SIZE);
 
             Shape circleObject = new Circle(size, userColorMap.get(worker.getUserLogin()));
             circleObject.setOnMouseClicked(this::shapeOnMouseClicked);
@@ -666,10 +662,10 @@ public class MainWindowController {
         long id = shapeMap.get(shape);
         for (Worker worker : workerTable.getItems()) {
             if (worker.getId() == id) {
-                if(shapeTooltip!=null && shapeTooltip.isShowing()) shapeTooltip.hide();
+                if (shapeTooltip != null && shapeTooltip.isShowing()) shapeTooltip.hide();
                 shapeTooltip = new Tooltip(worker.toString());
                 shapeTooltip.setAutoHide(true);
-                shapeTooltip.show(shape,event.getScreenX(),event.getScreenY());
+                shapeTooltip.show(shape, event.getScreenX(), event.getScreenY());
                 workerTable.getSelectionModel().select(worker);
                 //shapeTooltip.setText(worker.toString());
                 //shapeTooltip.show(primaryStage);
@@ -715,11 +711,11 @@ public class MainWindowController {
         }
         if (languageComboBox.getSelectionModel().getSelectedItem().isEmpty())
             languageComboBox.getSelectionModel().selectFirst();
-        languageComboBox.setOnAction((event) ->{
+        languageComboBox.setOnAction((event) -> {
             Locale locale = localeMap.get(languageComboBox.getValue());
             resourceFactory.setResources(ResourceBundle.getBundle
                     (App.BUNDLE, locale));
-            switch (locale.toString()){
+            switch (locale.toString()) {
                 case "en_NZ":
                     DateConverter.setPattern("yyyy-MM-dd");
                     break;
@@ -733,7 +729,8 @@ public class MainWindowController {
         });
         bindGuiLanguage();
     }
-    public void setApp(App a){
+
+    public void setApp(App a) {
         app = a;
     }
 }

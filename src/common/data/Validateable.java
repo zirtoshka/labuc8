@@ -1,7 +1,8 @@
 package common.data;
 
-public interface Validatable {
+public interface Validateable {
     /**
+     *
      * validates all fields after json deserialization
      *
      * @return

@@ -1,12 +1,16 @@
 package common.data;
 
+import common.exceptions.InvalidNumberException;
+
 import java.io.Serializable;
 
-public class Coordinates implements Validatable, Serializable {
-    private final float x;
-    private final Long y; //Значение поля должно быть больше -123, Поле не может быть null
-
-    public Coordinates(float x, Long y) {
+public class Coordinates implements Validateable, Serializable {
+    private double x;
+    private Integer y; //Значение поля должно быть больше -545, Поле не может быть null
+    public Coordinates(double x, Integer y) throws InvalidNumberException {
+        if (y == null || y <= -545 || Double.isInfinite(x) || Double.isNaN(x)) {
+            throw new InvalidNumberException();
+        }
         this.x = x;
         this.y = y;
     }
@@ -14,27 +18,26 @@ public class Coordinates implements Validatable, Serializable {
     /**
      * @return x coord
      */
-    public float getX() {
+    public double getX() {
         return x;
     }
 
     /**
      * @return y coord
      */
-    public Long getY() {
+    public Integer getY() {
         return y;
     }
 
     @Override
-    public String toString() {
+    public String toString(){
         String s = "";
-        s += "{\"x\" : " + x + ", ";
-        s += "\"y\" : " + y + "}";
+        s += "{\"x\" : " + Double.toString(x) + ", ";
+        s += "\"y\" : " + Integer.toString(y) + "}";
         return s;
     }
 
-    public boolean validate() {
-        return !(y == null || y <= -123 || Float.isInfinite(x) || Float.isNaN(x));
+    public boolean validate(){
+        return (y != null && y > -545 && !Double.isInfinite(x) && !Double.isNaN(x));
     }
-
 }

@@ -3,25 +3,21 @@ package common.data;
 /**
  * interface for storable object
  */
-public interface Collectionable extends Comparable<Collectionable>, Validatable {
+public interface Collectionable extends Comparable<Collectionable>, Validateable {
 
-    int getId();
-
+    public int getId();
     /**
      * sets id, useful for replacing object in collection
-     *
-     * @param ID
+     * @param id
      */
-    void setId(int ID);
+    public void setId(int id);
 
-    long getSalary();
-
-    String getName();
+    public String getName();
 
     /**
      * compairs two objects
      */
-    int compareTo(Collectionable worker);
+    public int compareTo(Collectionable labWork);
 
-    boolean validate();
+    public boolean validate();
 }
