@@ -17,11 +17,8 @@ public class ClientCommandManager extends CommandManager {
     private final Client client;
     public ClientCommandManager(Client c) {
         client = c;
-        addCommand(new ExecuteScriptCommand(this));
         addCommand(new ExitCommand());
         addCommand(new HelpCommand());
-        addCommand(new PrintUniqueSalaryCommand(client.getLabWorkManager()));
-        addCommand(new GroupCountingByEndDateCommand(client));
         addCommand(new FilterStartsWithNameCommand(client.getLabWorkManager()));
     }
 
@@ -60,30 +57,6 @@ public class ClientCommandManager extends CommandManager {
         print(res);
         return res;
     }
-    @Override
-    public void fileMode(String path) throws FileException {
-        currentScriptFileName=path;
-        inputManager = new FileInputManager(path);
-        isRunning = true;
-        while (isRunning && inputManager.hasNextLine()) {
-            CommandMsg commandMsg = inputManager.readCommand();
-            Response answerMsg = runCommand(commandMsg);
-            if (answerMsg.getStatus() == Response.Status.EXIT||answerMsg.getStatus() == Response.Status.ERROR) {
-                close();
-            }
-        }
-    }
 
-    public void runFile(File file) throws FileException{
-        currentScriptFileName=file.getName();
-        inputManager = new FileInputManager(file);
-        isRunning = true;
-        while (isRunning && inputManager.hasNextLine()) {
-            CommandMsg commandMsg = inputManager.readCommand();
-            Response answerMsg = runCommand(commandMsg);
-            if (answerMsg.getStatus() == Response.Status.EXIT||answerMsg.getStatus() == Response.Status.ERROR) {
-                close();
-            }
-        }
-    }
+
 }

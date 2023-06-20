@@ -3,6 +3,8 @@ package common.connection;
 import common.auth.User;
 import common.data.LabWork;
 
+import java.net.InetSocketAddress;
+
 /**
  * Message witch include command and arguments
  */
@@ -48,6 +50,11 @@ public class CommandMsg implements Request {
 
     public Status getStatus() {
         return status;
+    }
+
+    @Override
+    public InetSocketAddress getBroadcastAddress() {
+        return null;
     }
 
     public CommandMsg setUser(User usr) {

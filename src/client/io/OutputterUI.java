@@ -9,7 +9,7 @@ import javafx.scene.control.Alert;
 
 import java.util.Arrays;
 
-public class OutputterUI implements OutputManager {
+public class OutputterUI extends OutputManager {
     private ObservableResourceFactory resourceFactory;
     public OutputterUI(ObservableResourceFactory rf){
         resourceFactory = rf;

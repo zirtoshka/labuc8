@@ -438,19 +438,7 @@ public class MainWindowController {
         client.getCommandManager().runCommand(new CommandMsg("clear"));
     }
 
-    /**
-     * Execute script button on action.
-     */
-    @FXML
-    private void executeScriptButtonOnAction() {
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
-        if (selectedFile == null) return;
-        try {
-            client.getCommandManager().runFile(selectedFile);
-        } catch (FileException e) {
-            app.getOutputManager().error(e.getMessage());
-        }
-    }
+
 
     /**
      * Add button on action.

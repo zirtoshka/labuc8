@@ -3,6 +3,7 @@ package common.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import common.exceptions.InvalidDateFormatException;
@@ -10,7 +11,9 @@ import common.exceptions.InvalidDateFormatException;
  * Provides methods to convenient conversion between String and Date
  */
 public class DateConverter {
-    private static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+    private static String pattern = "yyyy-MM-dd";
+    private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+    private static DateTimeFormatter localDateFormatter = DateTimeFormatter.ofPattern(pattern);
 
     /**
      * convert Date to String
@@ -34,5 +37,10 @@ public class DateConverter {
         catch (ParseException e){
             throw new InvalidDateFormatException();
         }
+    }
+    public static void setPattern(String p){
+        pattern = p;
+        dateFormatter = new SimpleDateFormat(pattern);
+        localDateFormatter = DateTimeFormatter.ofPattern(pattern);
     }
 }

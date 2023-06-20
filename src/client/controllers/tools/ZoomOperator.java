@@ -1,6 +1,6 @@
 package client.controllers.tools;
 
-import common.data.Position;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
