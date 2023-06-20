@@ -1,7 +1,7 @@
 package server.commands;
 
-import common.command.core.CommandImpl;
-import common.command.core.CommandType;
+import common.commands.core.CommandImpl;
+import common.commands.core.CommandType;
 import common.exceptions.*;
 import server.collection.CollectionManager;
 import common.data.LabWork;
