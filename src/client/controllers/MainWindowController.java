@@ -12,7 +12,6 @@ import common.connection.Response;
 import common.data.*;
 import common.exceptions.ConnectionException;
 import common.exceptions.ConnectionTimeoutException;
-import common.exceptions.FileException;
 import common.exceptions.InvalidDataException;
 import common.utils.DateConverter;
 import javafx.animation.ScaleTransition;
@@ -65,7 +64,7 @@ public class MainWindowController {
     private final double MAX_SIZE = 100;
 
     @FXML
-    private TableView<LabWork> LabWorkTable;
+    private TableView<LabWork> labWorkTable;
     @FXML
     private TableColumn<LabWork, Integer> idColumn;
     @FXML
@@ -111,18 +110,14 @@ public class MainWindowController {
     private Button removeButton;
     @FXML
     private Button clearButton;
-    @FXML
-    private Button executeScriptButton;
-    @FXML
-    private Button addIfMinButton;
+
     @FXML
     private Button addIfMaxButton;
     @FXML
     private Button filterStartsWithNameButton;
     @FXML
     private Button groupByEndDateButton;
-    @FXML
-    private Button printUniqueSalariesButton;
+
     @FXML
     private Button refreshButton;
     @FXML
@@ -137,16 +132,13 @@ public class MainWindowController {
     private Tooltip removeButtonTooltip;
     @FXML
     private Tooltip clearButtonTooltip;
-    @FXML
-    private Tooltip executeScriptButtonTooltip;
-    @FXML
-    private Tooltip addIfMinButtonTooltip;
+
+
     @FXML
     private Tooltip removeGreaterButtonTooltip;
     @FXML
     private Tooltip historyButtonTooltip;
-    @FXML
-    private Tooltip sumOfHealthButtonTooltip;
+
     @FXML
     private Tooltip refreshButtonTooltip;
     @FXML
@@ -248,7 +240,7 @@ public class MainWindowController {
     }
 
     public void initFilter() {
-        tableFilter = new TableFilter<LabWork>(LabWorkTable, client.getLabWorkManager().getCollection(), resourceFactory)
+        tableFilter = new TableFilter<LabWork>(labWorkTable, client.getLabWorkManager().getCollection(), resourceFactory)
                 .addFilter(idColumn, (w) -> Integer.toString(w.getId()))
                 .addFilter(nameColumn, (w) -> w.getName())
                 .addFilter(coordinatesXColumn, (w) -> Double.toString(w.getCoordinates().getX()))
@@ -340,12 +332,9 @@ public class MainWindowController {
         updateButton.textProperty().bind(resourceFactory.getStringBinding("UpdateButton"));
         removeButton.textProperty().bind(resourceFactory.getStringBinding("RemoveButton"));
         clearButton.textProperty().bind(resourceFactory.getStringBinding("ClearButton"));
-        executeScriptButton.textProperty().bind(resourceFactory.getStringBinding("ExecuteScriptButton"));
-        addIfMinButton.textProperty().bind(resourceFactory.getStringBinding("AddIfMinButton"));
         addIfMaxButton.textProperty().bind(resourceFactory.getStringBinding("AddIfMaxButton"));
         groupByEndDateButton.textProperty().bind(resourceFactory.getStringBinding("GroupByEndDateButton"));
         filterStartsWithNameButton.textProperty().bind(resourceFactory.getStringBinding("FilterStartsWithNameButton"));
-        printUniqueSalariesButton.textProperty().bind(resourceFactory.getStringBinding("PrintUniqueSalariesButton"));
         refreshButton.textProperty().bind(resourceFactory.getStringBinding("RefreshButton"));
         helpButton.textProperty().bind(resourceFactory.getStringBinding("HelpButton"));
 
@@ -354,11 +343,8 @@ public class MainWindowController {
         updateButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("UpdateButtonTooltip"));
         removeButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("RemoveButtonTooltip"));
         clearButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("ClearButtonTooltip"));
-        executeScriptButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("ExecuteScriptButtonTooltip"));
-        addIfMinButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("AddIfMinButtonTooltip"));
         removeGreaterButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("RemoveGreaterButtonTooltip"));
         historyButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("HistoryButtonTooltip"));
-        sumOfHealthButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("SumOfHealthButtonTooltip"));
         refreshButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("RefreshButtonTooltip"));
     }
 
@@ -393,7 +379,7 @@ public class MainWindowController {
         }
         workerTable.getItems().add(worker);
 */
-        LabWork labWork = LabWorkTable.getSelectionModel().getSelectedItem();
+        LabWork labWork = labWorkTable.getSelectionModel().getSelectedItem();
         // int idx = workerTable.getSelectionModel().getSelectedIndex() + 1;
         //int i = workerTable.getSelectionModel().getSelectedIndex();
         if (labWork != null) {
@@ -421,7 +407,7 @@ public class MainWindowController {
      */
     @FXML
     private void removeButtonOnAction() {
-        LabWork labWork = LabWorkTable.getSelectionModel().getSelectedItem();
+        LabWork labWork = labWorkTable.getSelectionModel().getSelectedItem();
         if (labWork != null)
             client.getCommandManager().runCommand(new CommandMsg("remove_by_id").setArgument(Integer.toString(labWork.getId())));
         /*if (!spaceMarineTable.getSelectionModel().isEmpty())
@@ -583,7 +569,7 @@ public class MainWindowController {
 
 
     public void refreshTable() {
-        LabWorkTable.refresh();
+        labWorkTable.refresh();
         tableFilter.updateFilters();
     }
 
@@ -596,7 +582,7 @@ public class MainWindowController {
         shapeMap.clear();
         textMap.values().forEach(s -> canvasPane.getChildren().remove(s));
         textMap.clear();
-        SortedList<LabWork> list = LabWorkTable.getItems().sorted((w1, w2) -> w1.getName().compareTo(w2.getName()) > 0 ? 0 : 1);
+        SortedList<LabWork> list = labWorkTable.getItems().sorted((w1, w2) -> w1.getName().compareTo(w2.getName()) > 0 ? 0 : 1);
         for (LabWork labWork : list) {
             if (!userColorMap.containsKey(labWork.getUserLogin()))
                 userColorMap.put(labWork.getUserLogin(),
@@ -646,13 +632,13 @@ public class MainWindowController {
         Shape shape = (Shape) event.getSource();
         //Tooltip.install(shape,shapeTooltip);
         long id = shapeMap.get(shape);
-        for (LabWork worker : LabWorkTable.getItems()) {
+        for (LabWork worker : labWorkTable.getItems()) {
             if (worker.getId() == id) {
                 if (shapeTooltip != null && shapeTooltip.isShowing()) shapeTooltip.hide();
                 shapeTooltip = new Tooltip(worker.toString());
                 shapeTooltip.setAutoHide(true);
                 shapeTooltip.show(shape, event.getScreenX(), event.getScreenY());
-                LabWorkTable.getSelectionModel().select(worker);
+                labWorkTable.getSelectionModel().select(worker);
                 //shapeTooltip.setText(worker.toString());
                 //shapeTooltip.show(primaryStage);
                 break;
@@ -668,7 +654,7 @@ public class MainWindowController {
 
     public void setClient(Client client) {
         this.client = client;
-        LabWorkTable.setItems(client.getLabWorkManager().getCollection());
+        labWorkTable.setItems(client.getLabWorkManager().getCollection());
         client.getLabWorkManager().setController(this);
         client.setResourceFactory(resourceFactory);
     }
@@ -711,7 +697,7 @@ public class MainWindowController {
             }
 
             System.out.println(locale);
-            LabWorkTable.refresh();
+            labWorkTable.refresh();
         });
         bindGuiLanguage();
     }
