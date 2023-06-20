@@ -1,29 +1,23 @@
 package server.commands;
 
-import common.collection.LabWorkManager;
-import common.commands.CommandImpl;
-import common.commands.CommandType;
-import common.connection.AnswerMsg;
-import common.connection.CollectionOperation;
-import common.connection.Response;
-import common.data.Worker;
-import common.exceptions.CommandException;
-import common.exceptions.InvalidDataException;
-
-import java.util.Arrays;
+import common.command.core.CommandImpl;
+import common.command.core.CommandType;
+import common.exceptions.*;
+import common.data.*;
+import server.collection.CollectionManager;
+import server.exceptions.CheckIdException;
 
 public class AddCommand extends CommandImpl {
-    private final LabWorkManager collectionManager;
-
-    public AddCommand(LabWorkManager cm) {
-        super("add", CommandType.NORMAL, CollectionOperation.ADD);
+    private CollectionManager<LabWork> collectionManager;
+    public AddCommand(CollectionManager<LabWork> cm){
+        super("add", CommandType.NORMAL);
         collectionManager = cm;
     }
 
     @Override
-    public Response run() throws InvalidDataException, CommandException {
-        collectionManager.add(getWorkerArg());
-
-        return new AnswerMsg().info( "Added element: " + getWorkerArg().toString()).setCollection(Arrays.asList(getWorkerArg()));
+    public String execute() throws InvalidDataException, CommandException {
+        if (!hasLabWorkArg()) throw new CheckIdException();
+        collectionManager.add(getLabWorkArg());
+        return "Added element: " + getLabWorkArg().toString();
     }
 }

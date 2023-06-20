@@ -5,6 +5,7 @@ import common.data.*;
 import common.exceptions.*;
 import common.utils.DateConverter;
 import server.auth.UserManager;
+import server.collection.LabWorkCollectionManager;
 import server.collection.LabWorkDequeManager;
 import server.log.Log;
 
@@ -18,10 +19,53 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LabWorkDatabaseManager extends LabWorkDequeManager {
+import static common.io.ConsoleOutputter.print;
+
+public class LabWorkDatabaseManager extends LabWorkCollectionManager {
     //language=SQL
-    private final static String INSERT_WORKER_QUERY = "INSERT INTO WORKERS (name, coordinates_x, coordinates_y, creation_date, salary, end_date, position, status, organization_full_name, organization_type, user_login,id)" +
+    private final static String INSERT_LABWORK_QUERY = "INSERT INTO LABWORKS (name, coordinates_x, coordinates_y," +
+            "creation_date, minimal_point, personal_qualities_minimum, average_point, difficulty, discipline_name, " +
+            "discipline_lecture_hours, user_login, id) " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,DEFAULT) RETURNING id; ";
+    //language=SQL
+    private final static String CREATE_LABWORK_QUERY = "CREATE TABLE IF NOT EXISTS LABWORKS (" +
+            "id SERIAL PRIMARY KEY CHECK ( id > 0 )," +
+            "name VARCHAR(1237) NOT NULL CHECK (name <> '')," +
+            "coordinates_x DOUBLE PRECISION," +
+            "coordinates_y INTEGER NOT NULL CHECK (coordinates_y > -545 )," +
+            "creation_date TEXT NOT NULL," +
+            "minimal_point INTEGER NOT NULL CHECK(minimal_point > 0)," +
+            "personal_qualities_minimum INTEGER NOT NULL CHECK(personal_qualities_minimum > 0)," +
+            "average_point DOUBLE PRECISION CHECK(average_point > 0)," +
+            "difficulty TEXT NOT NULL," +
+            "discipline_name VARCHAR(1237) NOT NULL CHECK (discipline_name <> '')," +
+            "discipline_lecture_hours INTEGER NOT NULL," +
+            "user_login TEXT NOT NULL REFERENCES USERS(login));";
+    //language=SQL
+    private final static String SELECT_ID_LABWORK_QUERY = "SELECT nextval('id')";
+    //language=SQL
+    private final static String DELETE_LABWORK_QUERY = "DELETE FROM LABWORKS WHERE id = ?;";
+    //language=SQL
+    private final static String UPDATE_LABWORK_QUERY = "UPDATE LABWORKS SET " +
+            "name=?," +
+            "coordinates_x=?," +
+            "coordinates_y=?," +
+            "creation_date=?," +
+            "minimal_point=?," +
+            "personal_qualities_minimum=?," +
+            "average_point=?," +
+            "difficulty=?," +
+            "discipline_name=?," +
+            "discipline_lecture_hours=?," +
+            "user_login=?" +
+            "WHERE id=?";
+    //language=SQL
+    private final static String SELECT_MAX_NAME_LABWORK_QUERY = "SELECT MAX(name) FROM LABWORKS";
+    //language=SQL
+    private final static String DELETE_USER_LABWORK_QUERY = "DELETE FROM LABWORKS WHERE user_login=? RETURNING id";
+    //language=SQL
+    private final static String SELECT_ALL_LABWORK_QUERY = "SELECT * FROM LABWORKS";
+
     private final DatabaseHandler databaseHandler;
     private final UserManager userManager;
 
@@ -33,34 +77,16 @@ public class LabWorkDatabaseManager extends LabWorkDequeManager {
     }
 
     private void create() throws DatabaseException {
-        //language=SQL
-        String create =
-                "CREATE TABLE IF NOT EXISTS WORKERS (" +
-                        "id SERIAL PRIMARY KEY CHECK ( id > 0 )," +
-                        "name TEXT NOT NULL CHECK (name <> '')," +
-                        "coordinates_x FLOAT NOT NULL ," +
-                        "coordinates_y BIGINT NOT NULL CHECK (coordinates_y > -123 )," +
-                        "creation_date TEXT NOT NULL," +
-                        "salary BIGINT NOT NULL CHECK(salary > 0)," +
-                        "end_date TEXT," +
-                        "position TEXT," +
-                        "status TEXT NOT NULL," +
-                        "organization_full_name VARCHAR(1237) CHECK (organization_full_name <> '')," +
-                        "organization_type TEXT NOT NULL," +
-                        "user_login TEXT NOT NULL REFERENCES USERS(login)" +
-                        ");";
-
-        try (PreparedStatement createStatement = databaseHandler.getPreparedStatement(create)) {
+        try (PreparedStatement createStatement = databaseHandler.getPreparedStatement(CREATE_LABWORK_QUERY)) {
             createStatement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DatabaseException("cannot create worker database");
+            print(e.getMessage());
+            throw new DatabaseException("cannot create labWork database");
         }
     }
 
-    @Override
-    public int generateNextId() {
-        try (PreparedStatement statement = databaseHandler.getPreparedStatement("SELECT nextval('id')")) {
+    public Integer generateNextId() {
+        try (PreparedStatement statement = databaseHandler.getPreparedStatement(SELECT_ID_LABWORK_QUERY)) {
             ResultSet r = statement.executeQuery();
             r.next();
             return r.getInt(1);
@@ -69,199 +95,124 @@ public class LabWorkDatabaseManager extends LabWorkDequeManager {
         }
     }
 
-    private void setWorker(PreparedStatement statement, Worker worker) throws SQLException {
-        statement.setString(1, worker.getName());
-        statement.setFloat(2, worker.getCoordinates().getX());
-        statement.setLong(3, worker.getCoordinates().getY());
-        statement.setString(4, DateConverter.dateToString(worker.getCreationDate()));
-        statement.setLong(5, worker.getSalary());
-
-
-        if (worker.getEndDate() == null) statement.setString(6, null);
-        else statement.setString(6, DateConverter.dateToString(worker.getEndDate()));
-
-        if (worker.getPosition() == null) statement.setString(7, null);
-        else statement.setString(7, worker.getPosition().toString());
-
-        statement.setString(8, worker.getStatus().toString());
-
-        statement.setString(9, worker.getOrganization().getFullName());
-        statement.setString(10, worker.getOrganization().getType().toString());
-
-        statement.setString(11, worker.getUserLogin());
-
+    private void setLabWork(PreparedStatement statement, LabWork labWork) throws SQLException {
+        statement.setString(1, labWork.getName());
+        statement.setDouble(2, labWork.getCoordinates().getX());
+        statement.setInt(3, labWork.getCoordinates().getY());
+        statement.setString(4, DateConverter.dateToString(labWork.getCreationDate()));
+        statement.setInt(5, labWork.getMinimalPoint());
+        statement.setInt(6, labWork.getPersonalQualitiesMinimum());
+        statement.setDouble(7, labWork.getAveragePoint());
+        statement.setString(8, labWork.getDifficulty().toString());
+        statement.setString(9, labWork.getDiscipline().getName());
+        statement.setInt(10, labWork.getDiscipline().getLectureHours());
+        statement.setString(11, labWork.getUserLogin());
     }
 
-    private Worker getWorker(ResultSet resultSet) throws SQLException, InvalidDataException {
-        Coordinates coordinates = new Coordinates(resultSet.getFloat("coordinates_x"), resultSet.getLong("coordinates_y"));
+    private LabWork getLabWork(ResultSet resultSet) throws SQLException, InvalidDataException {
+        Coordinates coordinates = new Coordinates(resultSet.getFloat("coordinates_x"), resultSet.getInt("coordinates_y"));
         Integer id = resultSet.getInt("id");
         String name = resultSet.getString("name");
-
         Date creationDate = DateConverter.parseDate(resultSet.getString("creation_date"));
-        long salary = resultSet.getLong("salary");
-
-        String endDateStr = resultSet.getString("end_date");
-        LocalDate endDate = null;
-        if (endDateStr != null) endDate = DateConverter.parseLocalDate(endDateStr);
-
-        String positionStr = resultSet.getString("position");
-        Position position = null;
-        if (positionStr != null) {
+        Integer minimalPoint = resultSet.getInt("minimal_point");
+        int personalQualitiesMinimum = resultSet.getInt("personal_qualities_minimum");
+        Double averagePoint = resultSet.getDouble("average_point");
+        String difficultyStr = resultSet.getString("difficulty");
+        Difficulty difficulty = null;
+        if (difficultyStr != null) {
             try {
-                position = Position.valueOf(positionStr);
+                difficulty = Difficulty.valueOf(difficultyStr);
             } catch (IllegalArgumentException e) {
                 throw new InvalidEnumException();
             }
         }
-        Status status;
-        OrganizationType type;
-        try {
-            status = Status.valueOf(resultSet.getString("status"));
-            type = OrganizationType.valueOf(resultSet.getString("organization_type"));
-        } catch (IllegalArgumentException e) {
-            throw new InvalidEnumException();
-        }
-        String fullName = resultSet.getString("organization_full_name");
-        Organization organization = new Organization(fullName, type);
-        Worker worker = new Worker(name, coordinates, salary, endDate, position, status, organization);
-        worker.setCreationDate(creationDate);
-        worker.setId(id);
-        worker.setUserLogin(resultSet.getString("user_login"));
-        if (!userManager.isPresent(worker.getUserLogin())) throw new DatabaseException("no user found");
-        return worker;
+        Discipline discipline = new Discipline(resultSet.getString("discipline_name"), resultSet.getInt("discipline_lecture_hours"));
+        LabWork labWork = new LabWork(name, coordinates, minimalPoint, personalQualitiesMinimum, averagePoint, difficulty, discipline);
+        labWork.setCreationDate(creationDate);
+        labWork.setId(id);
+        labWork.setUserLogin(resultSet.getString("user_login"));
+        if (!userManager.isPresent(labWork.getUserLogin())) throw new DatabaseException("no user found");
+
+        return labWork;
     }
 
     @Override
-    public void add(Worker worker) {
-
+    public void add(LabWork labWork) {
         databaseHandler.setCommitMode();
         databaseHandler.setSavepoint();
-        try (PreparedStatement statement = databaseHandler.getPreparedStatement(INSERT_WORKER_QUERY, true)) {
-            setWorker(statement, worker);
+        try (PreparedStatement statement = databaseHandler.getPreparedStatement(INSERT_LABWORK_QUERY, true)) {
+            setLabWork(statement, labWork);
             if (statement.executeUpdate() == 0) throw new DatabaseException();
             ResultSet resultSet = statement.getGeneratedKeys();
 
             if (!resultSet.next()) throw new DatabaseException();
-            worker.setId(resultSet.getInt(resultSet.findColumn("id")));
+            labWork.setId(resultSet.getInt(resultSet.findColumn("id")));
 
             databaseHandler.commit();
         } catch (SQLException | DatabaseException e) {
             databaseHandler.rollback();
-            throw new CannotAddException();
+            throw new DatabaseException("cannot add to database");
         } finally {
             databaseHandler.setNormalMode();
         }
-        super.addWithoutIdGeneration(worker);
+        super.addWithoutIdGeneration(labWork);
     }
 
     @Override
-    public void removeByID(Integer id) {
-        //language=SQL
-        String query = "DELETE FROM WORKERS WHERE id = ?;";
+    public boolean removeById(Integer id) {
+        String query = DELETE_LABWORK_QUERY;
         try (PreparedStatement statement = databaseHandler.getPreparedStatement(query)) {
             statement.setInt(1, id);
             statement.execute();
         } catch (SQLException e) {
-            throw new CannotRemoveException(id);
+            throw new DatabaseException("cannot remove from database");
         }
-        super.removeByID(id);
+        return super.removeById(id);
     }
 
-    @Override
-    public void removeFirst() {
-        removeByID(getCollection().getFirst().getId());
-    }
 
     @Override
-    public void updateByID(Integer id, Worker worker) {
+    public boolean updateById(Integer id, LabWork labWork) {
         databaseHandler.setCommitMode();
         databaseHandler.setSavepoint();
-        //language=SQL
-        String sql = "UPDATE WORKERS SET " +
-                "name=?," +
-                "coordinates_x=?," +
-                "coordinates_y=?," +
-                "creation_date=?," +
-                "salary=?," +
-                "end_date=?," +
-                "position=?," +
-                "status=?," +
-                "organization_full_name=?," +
-                "organization_type=?," +
-                "user_login=?" +
-                "WHERE id=?";
+        String sql = UPDATE_LABWORK_QUERY;
         try (PreparedStatement statement = databaseHandler.getPreparedStatement(sql)) {
-            setWorker(statement, worker);
+            setLabWork(statement, labWork);
             statement.setInt(12, id);
             statement.execute();
             databaseHandler.commit();
         } catch (SQLException e) {
             databaseHandler.rollback();
-            throw new CannotUpdateException(id);
+            throw new DatabaseException("cannot update labWork #" + labWork.getId() + " in database");
         } finally {
             databaseHandler.setNormalMode();
         }
-        super.updateByID(id, worker);
+        return super.updateById(id, labWork);
     }
 
     @Override
-    public void addIfMax(Worker worker) {
-        //language=SQL
-        String getMaxQuery = "SELECT MAX(salary) FROM WORKERS";
+    public boolean addIfMax(LabWork labWork) {
+        String getMaxQuery = SELECT_MAX_NAME_LABWORK_QUERY;
 
         if (getCollection().isEmpty()) {
-            add(worker);
-            return;
+            add(labWork);
+            return true;
         }
         databaseHandler.setCommitMode();
         databaseHandler.setSavepoint();
         try (Statement getStatement = databaseHandler.getStatement();
-             PreparedStatement insertStatement = databaseHandler.getPreparedStatement(INSERT_WORKER_QUERY)) {
+             PreparedStatement insertStatement = databaseHandler.getPreparedStatement(INSERT_LABWORK_QUERY)) {
 
             ResultSet resultSet = getStatement.executeQuery(getMaxQuery);
-            if (!resultSet.next()) throw new CannotAddException();
+            if (!resultSet.next()) throw new DatabaseException("unable to add");
 
-            long maxSalary = resultSet.getLong(1);
-            if (worker.getSalary() < maxSalary)
-                throw new DatabaseException("[AddIfMaxException] unable to add, max salary is [" + maxSalary + "] current salary is [" + worker.getSalary()+"]");
+            String maxName = resultSet.getString(1);
+            if (labWork.getName().compareTo(maxName) < 0)
+                throw new DatabaseException("unable to add, max name is " + maxName + " current name is " + labWork.getName());
 
-            setWorker(insertStatement, worker);
+            setLabWork(insertStatement, labWork);
 
-            worker.setId(resultSet.getInt("id"));
-            databaseHandler.commit();
-        } catch (SQLException e) {
-            databaseHandler.rollback();
-            throw new CannotAddException();
-        } finally {
-            databaseHandler.setNormalMode();
-        }
-        super.addWithoutIdGeneration(worker);
-    }
-
-    @Override
-    public void addIfMin(Worker worker) {
-        //language=SQL
-        String getMaxQuery = "SELECT MIN(salary) FROM WORKERS";
-
-        if (getCollection().isEmpty()) {
-            add(worker);
-            return;
-        }
-        databaseHandler.setCommitMode();
-        databaseHandler.setSavepoint();
-        try (Statement getStatement = databaseHandler.getStatement();
-             PreparedStatement insertStatement = databaseHandler.getPreparedStatement(INSERT_WORKER_QUERY)) {
-
-            ResultSet resultSet = getStatement.executeQuery(getMaxQuery);
-            if (!resultSet.next()) throw new CannotAddException();
-
-            long minSalary = resultSet.getLong(1);
-            if (worker.getSalary() > minSalary)
-                throw new DatabaseException("[AddIfMinException] unable to add, min salary is [" + minSalary + "] current salary is [" + worker.getSalary()+"]");
-
-            setWorker(insertStatement, worker);
-
-            worker.setId(resultSet.getInt("id"));
+            labWork.setId(resultSet.getInt("id"));
             databaseHandler.commit();
         } catch (SQLException e) {
             databaseHandler.rollback();
@@ -269,15 +220,16 @@ public class LabWorkDatabaseManager extends LabWorkDequeManager {
         } finally {
             databaseHandler.setNormalMode();
         }
-        super.addWithoutIdGeneration(worker);
+        super.addWithoutIdGeneration(labWork);
+        return true;
     }
 
-    public Collection<Worker> clear(User user) {
+
+    public void clear(User user) {
         databaseHandler.setCommitMode();
         databaseHandler.setSavepoint();
         Set<Integer> ids = new HashSet<>();
-
-        try (PreparedStatement statement = databaseHandler.getPreparedStatement("DELETE FROM WORKERS WHERE user_login=? RETURNING id")) {
+        try (PreparedStatement statement = databaseHandler.getPreparedStatement(DELETE_USER_LABWORK_QUERY)) {
             statement.setString(1, user.getLogin());
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -291,24 +243,22 @@ public class LabWorkDatabaseManager extends LabWorkDequeManager {
         } finally {
             databaseHandler.setNormalMode();
         }
-        Collection<Worker> removed = getAll(ids);
         removeAll(ids);
-        return  removed;
     }
 
     @Override
-    public void deserializeCollection(String ignored) {
+    public boolean deserializeCollection(String ignored) {
+        boolean isHappened = true;
         if (!getCollection().isEmpty()) super.clear();
-        //language=SQL
-        String query = "SELECT * FROM WORKERS";
+        String query = SELECT_ALL_LABWORK_QUERY;
         try (PreparedStatement selectAllStatement = databaseHandler.getPreparedStatement(query)) {
             ResultSet resultSet = selectAllStatement.executeQuery();
             int damagedElements = 0;
             while (resultSet.next()) {
                 try {
-                    Worker worker = getWorker(resultSet);
-                    if (!worker.validate()) throw new InvalidDataException("element is damaged");
-                    super.addWithoutIdGeneration(worker);
+                    LabWork labWork = getLabWork(resultSet);
+                    if (!labWork.validate()) throw new InvalidDataException("element is damaged");
+                    super.addWithoutIdGeneration(labWork);
                 } catch (InvalidDataException | SQLException e) {
                     damagedElements += 1;
                 }
@@ -317,8 +267,10 @@ public class LabWorkDatabaseManager extends LabWorkDequeManager {
             if (damagedElements == 0) Log.logger.info("collection successfully loaded");
             else Log.logger.warn(damagedElements + " elements are damaged");
         } catch (SQLException e) {
+            isHappened = false;
             throw new DatabaseException("cannot load");
+        } finally {
+            return isHappened;
         }
-
     }
 }

@@ -68,7 +68,7 @@ public class ServerCommandManager extends CommandManager {
                 if (!userManager.isValid(user)) throw new AuthException();
 
                 //link user to worker
-                Worker worker = msg.getWorker();
+                Worker worker = msg.getLabWork();
                 if (worker != null) worker.setUser(user);
             }
 

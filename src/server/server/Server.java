@@ -1,36 +1,44 @@
 package server.server;
 
-
-import common.collection.LabWorkManager;
-
-import common.auth.User;
-import common.commands.CommandType;
-import common.connection.*;
-import common.data.Worker;
-import common.exceptions.*;
-import server.auth.UserManager;
-import server.commands.ServerCommandManager;
-import server.database.DatabaseHandler;
-import server.database.UserDatabaseManager;
-import server.database.LabWorkDatabaseManager;
-import server.exceptions.ServerOnlyCommandException;
-import server.log.Log;
-
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import common.auth.User;
+import common.command.core.CommandType;
+import common.command.core.Commandable;
+import common.connection.*;
+import common.data.*;
+
+import common.exceptions.*;
+import server.auth.UserManager;
+import server.collection.CollectionManager;
+import server.collection.LabWorkCollectionManager;
+import server.commands.ServerCommandManager;
+import server.database.DatabaseHandler;
+import server.database.LabWorkDatabaseManager;
+import server.database.UserDatabaseManager;
+import server.exceptions.ServerOnlyCommandException;
+import server.log.Log;
 
 /**
  * server class
  */
-public class Server extends Thread implements SenderReceiver {
+public class Server {
+    public final int BUFFER_SIZE = 10240;
     public final int MAX_CLIENTS = 10;
 
-    private LabWorkManager collectionManager;
+    private LabWorkCollectionManager collectionManager;
     private ServerCommandManager commandManager;
     private DatabaseHandler databaseHandler;
     private UserManager userManager;
@@ -44,7 +52,6 @@ public class Server extends Thread implements SenderReceiver {
 
     private Queue<Map.Entry<InetSocketAddress, Request>> requestQueue;
     private Queue<Map.Entry<InetSocketAddress, Response>> responseQueue;
-    private Set<InetSocketAddress> activeClients;
     private volatile boolean running;
 
     private Selector selector;
@@ -54,7 +61,7 @@ public class Server extends Thread implements SenderReceiver {
     private void init(int p, Properties properties) throws ConnectionException, DatabaseException {
         running = true;
         port = p;
-        setDaemon(true);
+
         hostUser = null;
         receiverThreadPool = Executors.newFixedThreadPool(MAX_CLIENTS);
         senderThreadPool = Executors.newFixedThreadPool(MAX_CLIENTS);
@@ -62,7 +69,6 @@ public class Server extends Thread implements SenderReceiver {
 
         requestQueue = new ConcurrentLinkedQueue<>();
         responseQueue = new ConcurrentLinkedQueue<>();
-        activeClients = ConcurrentHashMap.newKeySet();
 
         databaseHandler = new DatabaseHandler(properties.getProperty("url"), properties.getProperty("user"), properties.getProperty("password"));
         userManager = new UserDatabaseManager(databaseHandler);
@@ -76,14 +82,13 @@ public class Server extends Thread implements SenderReceiver {
             Log.logger.error(e.getMessage());
         }
         host(port);
-        setName("server thread");
-        Log.logger.trace("starting server");
+        Log.logger.info("starting server");
     }
 
-    private void host(int p) throws ConnectionException {
+    private void host(int port) throws ConnectionException {
         try {
             if (channel != null && channel.isOpen()) channel.close();
-            port = p;
+            this.port = port;
             channel = DatagramChannel.open();
             channel.configureBlocking(false);
             channel.bind(new InetSocketAddress(port));
@@ -98,7 +103,6 @@ public class Server extends Thread implements SenderReceiver {
         }
     }
 
-
     public Server(int p, Properties properties) throws ConnectionException, DatabaseException {
         init(p, properties);
     }
@@ -109,15 +113,14 @@ public class Server extends Thread implements SenderReceiver {
      * @throws ConnectionException
      * @throws InvalidDataException
      */
-    public void receive() throws ConnectionException, InvalidDataException {
+    public void receive() throws ConnectionException, InvalidDataException{
         ByteBuffer buf = ByteBuffer.allocate(BUFFER_SIZE);
         InetSocketAddress clientAddress = null;
         Request request = null;
         try {
             clientAddress = (InetSocketAddress) channel.receive(buf);
             if (clientAddress == null) return; //no data to read
-            if(!activeClients.contains(clientAddress)) activeClients.add(clientAddress);
-            Log.logger.trace("received request from " + clientAddress.toString());
+            Log.logger.info("received request from " + clientAddress.toString());
         } catch (ClosedChannelException e) {
             throw new ClosedConnectionException();
         } catch (IOException e) {
@@ -129,16 +132,10 @@ public class Server extends Thread implements SenderReceiver {
         } catch (ClassNotFoundException | ClassCastException | IOException e) {
             throw new InvalidReceivedDataException();
         }
+
         requestQueue.offer(new AbstractMap.SimpleEntry<>(clientAddress, request));
-
     }
 
-    public void broadcast(Response response) {
-        Log.logger.trace("broadcasting changes");
-        for(InetSocketAddress client: activeClients){
-            responseQueue.offer(new AbstractMap.SimpleEntry<>(client, response));
-        }
-    }
     /**
      * sends response
      *
@@ -149,123 +146,56 @@ public class Server extends Thread implements SenderReceiver {
     public void send(InetSocketAddress clientAddress, Response response) throws ConnectionException {
         if (clientAddress == null) throw new InvalidAddressException("no client address found");
         try {
-
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(BUFFER_SIZE);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             objectOutputStream.writeObject(response);
             channel.send(ByteBuffer.wrap(byteArrayOutputStream.toByteArray()), clientAddress);
-            Log.logger.trace("sent response to " + clientAddress.toString());
+            Log.logger.info("sent response to " + clientAddress.toString());
         } catch (IOException e) {
             throw new ConnectionException("something went wrong during sending response");
         }
     }
 
-    private void handleRequest(InetSocketAddress address, Request request) {
-        AnswerMsg answerMsg = new AnswerMsg();
-        try {
-
-            if(request.getStatus()==Request.Status.EXIT){
-                activeClients.remove(address);
-                Log.logger.info("client " + address.toString() + " shut down");
-                return;
-            }
-            if(request.getStatus()==Request.Status.HELLO){
-                answerMsg = new AnswerMsg().setStatus(Response.Status.COLLECTION).setCollectionOperation(CollectionOperation.ADD).setCollection(collectionManager.getCollection());
-                activeClients.add(address);
-                responseQueue.offer(new AbstractMap.SimpleEntry<>(address, answerMsg));
-                return;
-            }
-            if(request.getStatus()==Request.Status.CONNECTION_TEST){
-                answerMsg.setStatus(Response.Status.FINE);
-                responseQueue.offer(new AbstractMap.SimpleEntry<>(address, answerMsg));
-                return;
-            }
-            Worker worker = request.getWorker();
-
-            if (worker != null) {
-                worker.setCreationDate(new Date());
-            }
-
-            request.setStatus(Request.Status.RECEIVED_BY_SERVER);
-
-            if (commandManager.getCommand(request).getType() == CommandType.SERVER_ONLY) {
-                throw new ServerOnlyCommandException();
-            }
-            answerMsg = (AnswerMsg) commandManager.runCommand(request);
-
-
-            if (answerMsg.getStatus() == Response.Status.EXIT) {
-                close();
-            }
-        } catch (CommandException e) {
-            answerMsg.error(e.getMessage());
-            Log.logger.error(e.getMessage());
-        }
-
-
-        System.out.println(commandManager.getCommand(request).getOperation().toString());
-        if(answerMsg.getCollectionOperation()!= CollectionOperation.NONE && answerMsg.getStatus()==Response.Status.FINE){
-            answerMsg.setStatus(Response.Status.BROADCAST);
-            broadcast(answerMsg);
-        }else {
-            responseQueue.offer(new AbstractMap.SimpleEntry<>(address, answerMsg));
-        }
-        //responseQueue.offer(new AbstractMap.SimpleEntry<>(address, answerMsg));
-    }
-
     /**
-     * runs server in multithreading mode
+     * runs server
      */
     public void run() {
-        while (running) {
-            try {
-                selector.select();
-            } catch (IOException e) {
-                continue;
-            }
-            Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
-            while (selectedKeys.hasNext()) {
-                SelectionKey key = selectedKeys.next();
-                selectedKeys.remove();
-                if (!key.isValid()) {
+        Thread threadServer = new Thread(() -> {
+            while (running) {
+                try {
+                    selector.select();
+                } catch (IOException e) {
                     continue;
                 }
-                if (key.isReadable()) {
-                    receiverThreadPool.submit(new Receiver());
-                    continue;
+                Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
+                while (selectedKeys.hasNext()) {
+                    SelectionKey key = selectedKeys.next();
+                    selectedKeys.remove();
+                    if (!key.isValid()) {
+                        continue;
+                    }
+                    if (key.isReadable()) {
+                        receiverThreadPool.submit(new Receiver());
+                        continue;
+                    }
+                    if (key.isWritable() && responseQueue.size() > 0) {
+                        senderThreadPool.submit(new Sender(responseQueue.poll()));
+                    }
                 }
-                if (key.isWritable() && responseQueue.size() > 0) {
-                    senderThreadPool.submit(new Sender(responseQueue.poll()));
+                if (requestQueue.size() > 0) {
+                    requestHandlerThreadPool.submit(new RequestHandler(requestQueue.poll()));
                 }
             }
-            if (requestQueue.size() > 0) {
-                requestHandlerThreadPool.submit(new RequestHandler(requestQueue.poll()));
-            }
-        }
-    }
-
-    /**
-     * runs server in console mode
-     */
-    public void consoleMode() {
+        });
+        threadServer.start();
         commandManager.consoleMode();
     }
 
     /**
      * close server and connection
      */
-    public void close() {
-        try {
-            broadcast(new AnswerMsg().setStatus(Response.Status.EXIT));
-
-            while (responseQueue.size()>0){
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored){
-
-                }
-            }
+    public void close(){
+        try{
             running = false;
             receiverThreadPool.shutdown();
             requestHandlerThreadPool.shutdown();
@@ -277,7 +207,11 @@ public class Server extends Thread implements SenderReceiver {
         }
     }
 
-    public LabWorkManager getCollectionManager() {
+    public Commandable getCommandManager(){
+        return commandManager;
+    }
+
+    public CollectionManager<LabWork> getCollectionManager() {
         return collectionManager;
     }
 
@@ -301,6 +235,32 @@ public class Server extends Thread implements SenderReceiver {
                 Log.logger.error(e.getMessage());
             }
         }
+    }
+
+    private void handleRequest(InetSocketAddress address, Request request) {
+        AnswerMsg answerMsg = new AnswerMsg();
+        try {
+
+            LabWork labWork = request.getLabWork();
+
+            if (labWork != null) {
+                labWork.setCreationDate(new Date());
+            }
+            request.setStatus(Request.Status.RECEIVED_BY_SERVER);
+
+            if (commandManager.getCommand(request).getType() == CommandType.SERVER_ONLY) {
+                throw new ServerOnlyCommandException();
+            }
+            answerMsg = (AnswerMsg) commandManager.runCommand(request);
+
+            if (answerMsg.getStatus() == Response.Status.EXIT) {
+                close();
+            }
+        } catch (CommandException e) {
+            answerMsg.error(e.getMessage());
+            Log.logger.error(e.getMessage());
+        }
+        responseQueue.offer(new AbstractMap.SimpleEntry<>(address, answerMsg));
     }
 
     private class RequestHandler implements Runnable {
@@ -333,9 +293,5 @@ public class Server extends Thread implements SenderReceiver {
                 Log.logger.error(e.getMessage());
             }
         }
-    }
-
-    public boolean isRunning(){
-        return running;
     }
 }

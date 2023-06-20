@@ -15,7 +15,7 @@ public class AddIfMaxCommand extends CommandImpl {
 
     @Override
     public String execute() {
-        collectionManager.addIfMax(getWorkerArg());
-        return ("Added element: " + getWorkerArg().toString());
+        collectionManager.addIfMax(getLabWork());
+        return ("Added element: " + getLabWork().toString());
     }
 }

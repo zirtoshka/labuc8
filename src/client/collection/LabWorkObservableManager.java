@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,21 +29,21 @@ public class LabWorkObservableManager extends LabWorkManagerImpl<ObservableList<
     }
     public void applyChanges(Response response){
         CollectionOperation op = response.getCollectionOperation();
-        Collection<Worker> changes = response.getCollection();
+        Collection<LabWork> changes = response.getCollection();
 
         if(op==CollectionOperation.ADD){
-            for(Worker worker: changes){
-                super.addWithoutIdGeneration(worker);
+            for(LabWork labWork: changes){
+                super.addWithoutIdGeneration(labWork);
             }
         }
         if(op==CollectionOperation.REMOVE){
-            for(Worker worker: changes){
-                super.removeByID(worker.getId());
+            for(LabWork labWork: changes){
+                super.removeByID(labWork.getId());
             }
         }
         if(op==CollectionOperation.UPDATE){
-            for(Worker worker: changes){
-                super.updateByID(worker.getId(),worker);
+            for(LabWork labWork: changes){
+                super.updateByID(labWork.getId(),labWork);
             }
         }
         if(controller!=null && op!=CollectionOperation.NONE && changes!=null && !changes.isEmpty()){
@@ -54,19 +55,29 @@ public class LabWorkObservableManager extends LabWorkManagerImpl<ObservableList<
         }
 
     }
-    public ObservableList<Worker> getCollection(){
+    public ObservableList<LabWork> getCollection(){
         return collection;
     }
     @Override
-    public void updateByID(Integer id, Worker newWorker) {
+    public void updateByID(Integer id, LabWork newWorker) {
         assertNotEmpty();
-        Optional<Worker> worker = getCollection().stream()
+        Optional<LabWork> labWork = getCollection().stream()
                 .filter(w -> w.getId() == id)
                 .findFirst();
-        if (!worker.isPresent()) {
+        if (!labWork.isPresent()) {
             throw new NoSuchIdException(id);
         }
-        Collections.replaceAll(collection,worker.get(),newWorker);
+        Collections.replaceAll(collection,labWork.get(),newWorker);
+    }
+
+    @Override
+    public Map<LocalDate, Integer> groupByEndDate() {
+        return null;
+    }
+
+    @Override
+    public List<Long> getUniqueSalaries() {
+        return null;
     }
 
     public void setController(MainWindowController c){

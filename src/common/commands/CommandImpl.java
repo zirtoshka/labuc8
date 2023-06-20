@@ -1,10 +1,8 @@
 package common.commands;
 
 import common.connection.*;
-import common.data.Worker;
+import common.data.LabWork;
 import common.exceptions.*;
-
-import java.util.HashSet;
 
 /**
  * basic command implementation
@@ -76,7 +74,7 @@ public abstract class CommandImpl implements Command {
     }
 
     public boolean hasWorkerArg() {
-        return arg != null && arg.getWorker() != null;
+        return arg != null && arg.getLabWork() != null;
     }
 
     public boolean hasUserArg() {
@@ -87,7 +85,7 @@ public abstract class CommandImpl implements Command {
         return getArgument().getStringArg();
     }
 
-    public Worker getWorkerArg() {
-        return getArgument().getWorker();
+    public LabWork getLabWork() {
+        return getArgument().getLabWork();
     }
 }

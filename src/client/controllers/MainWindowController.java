@@ -399,7 +399,7 @@ public class MainWindowController {
         if (labWork != null) {
             askWindowController.setLabWork(labWork);
             try {
-                client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(labWork.getId())).setWorker(askWindowController.readLabWork()));
+                client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(labWork.getId())).setLabWork(askWindowController.readLabWork()));
             } catch (InvalidDataException e) {
                 //e.printStackTrace();
             }
@@ -460,7 +460,7 @@ public class MainWindowController {
         //askWindowController.clearMarine();
 
         try {
-            client.getCommandManager().runCommand(new CommandMsg("add").setWorker(askWindowController.readLabWork()));
+            client.getCommandManager().runCommand(new CommandMsg("add").setLabWork(askWindowController.readLabWork()));
         } catch (InvalidDataException e) {
 
         }
@@ -477,7 +477,7 @@ public class MainWindowController {
         try {
             LabWork labWork = askWindowController.readLabWork();
             if (labWork != null) {
-                client.getCommandManager().runCommand(new CommandMsg("add_if_min").setWorker(labWork));
+                client.getCommandManager().runCommand(new CommandMsg("add_if_min").setLabWork(labWork));
                 /*workerTable.refresh();
                 refreshCanvas();*/
             }
@@ -492,7 +492,7 @@ public class MainWindowController {
         try {
             LabWork labWork = askWindowController.readLabWork();
             if (labWork != null) {
-                client.getCommandManager().runCommand(new CommandMsg("add_if_max").setWorker(labWork));
+                client.getCommandManager().runCommand(new CommandMsg("add_if_max").setLabWork(labWork));
                 /*workerTable.refresh();
                 refreshCanvas();*/
             }

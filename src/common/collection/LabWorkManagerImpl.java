@@ -54,7 +54,7 @@ public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implemen
     /**
      * Add element to collection
      *
-     * @param worker Element of collection
+     * @param labWork Element of collection
      */
     public void add(LabWork labWork) {
         int id = generateNextId();
@@ -172,7 +172,7 @@ public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implemen
     /**
      * Add if ID of element bigger than max in collection
      *
-     * @param worker Element
+     * @param labWork Element
      */
     public void addIfMax(LabWork labWork) {
         if (getCollection().stream()
@@ -187,7 +187,7 @@ public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implemen
     /**
      * Add if ID of element smaller than min in collection
      *
-     * @param worker Element
+     * @param labWork Element
      */
     public void addIfMin(LabWork labWork) {
         if (getCollection().stream()

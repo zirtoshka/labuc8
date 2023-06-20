@@ -17,9 +17,9 @@ public class TableFilter <T>{
     private ObservableList<T> list;
     private Map<TableColumn<T,?>, FilterArg> columnsFilters;
     //private Converter<T> converter;
-    public TableFilter(TableView<LabWork> tab, ObservableList<Worker> l, ObservableResourceFactory res){
-        table = tab;
-        list = l;
+    public TableFilter(TableView<LabWork> tab, ObservableList<LabWork> l, ObservableResourceFactory res){
+        table = (TableView<T>) tab;
+        list = (ObservableList<T>) l;
         resourceFactory = res;
         columnsFilters = new HashMap<>();
     }

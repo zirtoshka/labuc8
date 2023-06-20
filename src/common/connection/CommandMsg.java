@@ -1,7 +1,7 @@
 package common.connection;
 
 import common.auth.User;
-import common.data.Worker;
+import common.data.LabWork;
 
 /**
  * Message witch include command and arguments
@@ -9,34 +9,34 @@ import common.data.Worker;
 public class CommandMsg implements Request {
     private final String commandName;
     private String commandStringArgument;
-    private Worker worker;
+    private LabWork labWork;
     private User user;
     private Status status;
 
-    public CommandMsg(String commandNm, String commandSA, Worker w) {
+    public CommandMsg(String commandNm, String commandSA, LabWork labWork) {
         commandName = commandNm;
         commandStringArgument = commandSA;
-        worker = w;
+        labWork = labWork;
         user = null;
         status = Status.DEFAULT;
     }
     public  CommandMsg(){
         commandName = null;
         commandStringArgument=null;
-        worker = null;
+        labWork = null;
         status = Status.DEFAULT;
     }
     public  CommandMsg(String s){
         commandName = s;
         commandStringArgument=null;
-        worker = null;
+        labWork = null;
         status = Status.DEFAULT;
     }
 
-    public CommandMsg(String commandNm, String commandSA, Worker w, User usr) {
+    public CommandMsg(String commandNm, String commandSA, LabWork labWork, User usr) {
         commandName = commandNm;
         commandStringArgument = commandSA;
-        worker = w;
+        labWork = labWork;
         user = usr;
         status = Status.DEFAULT;
     }
@@ -55,8 +55,8 @@ public class CommandMsg implements Request {
         return this;
     }
 
-    public CommandMsg setWorker(Worker w){
-        worker = w;
+    public CommandMsg setLabWork(LabWork labWork){
+        this.labWork = labWork;
         return this;
     }
 
@@ -83,8 +83,8 @@ public class CommandMsg implements Request {
     /**
      * @return Command object argument.
      */
-    public Worker getWorker() {
-        return worker;
+    public LabWork getLabWork() {
+        return labWork;
     }
 
     public User getUser() {

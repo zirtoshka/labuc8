@@ -15,8 +15,8 @@ public class AddIfMinCommand extends CommandImpl {
 
     @Override
     public String execute() {
-        collectionManager.addIfMin(getWorkerArg());
-        return ("Added element: " + getWorkerArg().toString());
+        collectionManager.addIfMin(getLabWork());
+        return ("Added element: " + getLabWork().toString());
     }
 
 }

@@ -36,8 +36,8 @@ public class UpdateCommand extends CommandImpl {
         if (workerCreatorLogin == null || !workerCreatorLogin.equals(owner))
             throw new PermissionException(owner);
 
-        collectionManager.updateByID(id, getWorkerArg());
-        return new AnswerMsg().info( "element #" + id + " updated").setCollection(List.of(getWorkerArg())).setCollectionOperation(CollectionOperation.UPDATE);
+        collectionManager.updateByID(id, getLabWork());
+        return new AnswerMsg().info( "element #" + id + " updated").setCollection(List.of(getLabWork())).setCollectionOperation(CollectionOperation.UPDATE);
     }
 
 }

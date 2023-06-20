@@ -1,14 +1,14 @@
 package common.connection;
 
 import common.auth.User;
-import common.data.Worker;
+import common.data.LabWork;
 
 import java.io.Serializable;
 
 public interface Request extends Serializable {
     String getStringArg();
 
-    Worker getWorker();
+    LabWork getLabWork();
 
     String getCommandName();
 

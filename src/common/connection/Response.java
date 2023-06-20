@@ -1,6 +1,7 @@
 package common.connection;
 
-import common.data.Worker;
+
+import common.data.LabWork;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -28,5 +29,5 @@ public interface Response extends Serializable {
 
     CollectionOperation getCollectionOperation();
 
-    public Collection<Worker> getCollection();
+    public Collection<LabWork> getCollection();
 }
