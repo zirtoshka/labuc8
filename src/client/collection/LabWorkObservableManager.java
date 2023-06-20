@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -68,16 +67,6 @@ public class LabWorkObservableManager extends LabWorkManagerImpl<ObservableList<
             throw new NoSuchIdException(id);
         }
         Collections.replaceAll(collection,labWork.get(),newWorker);
-    }
-
-    @Override
-    public Map<LocalDate, Integer> groupByEndDate() {
-        return null;
-    }
-
-    @Override
-    public List<Long> getUniqueSalaries() {
-        return null;
     }
 
     public void setController(MainWindowController c){

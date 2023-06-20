@@ -1,10 +1,10 @@
 package common.exceptions;
-
 /**
- * thrown when file path is empty
+ * thrown when path is empty
  */
-public class EmptyPathException extends FileException {
-    public EmptyPathException() {
-        super("path is empty");
+public class EmptyPathException extends FileException{
+    private static final String message = "path is empty";
+    public EmptyPathException(){
+        super(message);
     }
 }

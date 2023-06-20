@@ -1,6 +1,6 @@
 package common.auth;
 
-import common.crypto.SHA384Generator;
+import common.crypto.SHA1Generator;
 import common.exceptions.EncryptionException;
 
 import java.io.Serializable;
@@ -14,7 +14,7 @@ public class User implements Serializable {
     public User(String username, String password) {
         this.username = username;
         try {
-            this.password = SHA384Generator.hash(password);
+            this.password = SHA1Generator.hash(password);
         } catch (EncryptionException e) {
             this.password = null;
         }

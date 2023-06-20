@@ -1,15 +1,13 @@
 package common.connection;
 
-
 import common.data.LabWork;
 
 import java.io.Serializable;
 import java.util.Collection;
 
-public interface Response extends Serializable {
-    String getMessage();
-
-    Status getStatus();
+public interface Response extends Serializable{
+    public String getMessage();
+    public Status getStatus();
 
     /**
      * Status enum:
@@ -17,16 +15,16 @@ public interface Response extends Serializable {
      * FINE: All right
      * EXIT: Need to stop program
      */
-    enum Status {
+    public enum Status {
         ERROR,
         FINE,
         EXIT,
+        CHECK_ID,
         AUTH_SUCCESS,
         BROADCAST,
-        COLLECTION
+        COLLECTION,
+        LOGOUT
     }
-
-
     CollectionOperation getCollectionOperation();
 
     public Collection<LabWork> getCollection();

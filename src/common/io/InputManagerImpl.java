@@ -2,169 +2,182 @@ package common.io;
 
 import common.auth.User;
 import common.connection.CommandMsg;
-import common.data.*;
+import common.data.Coordinates;
+import common.data.Difficulty;
+import common.data.Discipline;
+import common.data.LabWork;
 import common.exceptions.*;
 
-import java.time.LocalDate;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
-
-import static common.utils.DateConverter.parseLocalDate;
 
 /**
  * basic implementation of InputManager
  */
-public abstract class InputManagerImpl implements InputManager {
+public abstract class InputManagerImpl implements InputManager{
+    private static final int TWICE = 2;
+    private static final int THE_FIRST_PART = 0;
+    private static final int THE_SECOND_PART = 1;
     private Scanner scanner;
 
-    public InputManagerImpl(Scanner scanner) {
-        this.scanner = scanner;
-
-    }
-
-    private String read() {
-        return scanner.nextLine();
+    public InputManagerImpl(Scanner sc){
+        scanner = sc;
     }
 
     public boolean hasNextLine() {
         return scanner.hasNextLine();
     }
-
-    public Scanner getScanner() {
+    public Scanner getScanner(){
         return scanner;
     }
 
-    public void setScanner(Scanner sc) {
+    public void setScanner(Scanner sc){
         scanner = sc;
     }
-
-    public String readName() throws EmptyStringException {
-        String s = read();
-        if (s.equals("")) {
+    public String readName() throws EmptyStringException, InvalidInputCharacterException {
+        String s = scannerNextLine();
+        if (s.equals("")){
             throw new EmptyStringException();
         }
         return s;
     }
 
-    public String readFullName() {
-        String s = read();
-        if (s.equals("")) {
-            return null;
+    public double readXCoord() throws InvalidNumberException, InvalidInputCharacterException {
+        double x;
+        try{
+            x = Double.parseDouble(scannerNextLine());
         }
-        return s;
-    }
-
-    public float readXCoord() throws InvalidNumberException {
-        float x;
-        try {
-            x = Float.parseFloat(read());
-        } catch (NumberFormatException e) {
+        catch(NumberFormatException e){
             throw new InvalidNumberException();
         }
-        if (Float.isInfinite(x) || Float.isNaN(x)) throw new InvalidNumberException("invalid float value");
         return x;
     }
 
-    public Long readYCoord() throws InvalidNumberException {
-        Long y;
-        try {
-            y = Long.parseLong(read());
-        } catch (NumberFormatException e) {
+    public Integer readYCoord() throws InvalidNumberException, InvalidInputCharacterException {
+        Integer y;
+        try{
+            y = Integer.parseInt(scannerNextLine());
+            if (y <= -545) throw new InvalidNumberException();
+        }
+        catch(NumberFormatException e){
             throw new InvalidNumberException();
         }
-        if (y <= -123) throw new InvalidNumberException("must be greater than -123");
         return y;
     }
-
-    public Coordinates readCoords() throws InvalidNumberException {
-        float x = readXCoord();
-        Long y = readYCoord();
-        Coordinates coord = new Coordinates(x, y);
+    public Coordinates readCoords() throws InvalidNumberException, InvalidInputCharacterException {
+        double x = readXCoord();
+        Integer y = readYCoord();
+        Coordinates coord = new Coordinates(x,y);
         return coord;
     }
 
-    public long readSalary() throws InvalidNumberException {
-        Long s;
-        try {
-            s = Long.parseLong(read());
-        } catch (NumberFormatException e) {
+    public Integer readMinimalPoint() throws InvalidNumberException, InvalidInputCharacterException {
+        Integer minimalPoint;
+        try{
+            minimalPoint = Integer.parseInt(scannerNextLine());
+            if (minimalPoint <= 0) throw new InvalidNumberException();
+        }
+        catch(NumberFormatException e){
             throw new InvalidNumberException();
         }
-
-        if (s <= 0) throw new InvalidNumberException("must be greater than 0");
-
-        return s;
+        return minimalPoint;
     }
 
-    public LocalDate readEndDate() throws InvalidDateFormatException {
-        String buf = read();
-        if (buf.equals("")) {
-            return null;
-        } else {
-            return parseLocalDate(buf);
+    /**
+     * reads personal qualities minimum from input
+     * @return
+     * @throws InvalidNumberException
+     */
+    public int readPersonalQualitiesMinimum() throws InvalidNumberException, InvalidInputCharacterException {
+        int personalQualitiesMinimum;
+        try{
+            personalQualitiesMinimum = Integer.parseInt(scannerNextLine());
+            if (personalQualitiesMinimum <= 0) throw new InvalidNumberException();
         }
+        catch(NumberFormatException e){
+            throw new InvalidNumberException();
+        }
+        return personalQualitiesMinimum;
     }
 
-    public Position readPosition() throws InvalidEnumException {
-        String s = read();
-        if (s.equals("")) {
-            return null;
-        } else {
-            try {
-                return Position.valueOf(s);
-            } catch (IllegalArgumentException e) {
-                throw new InvalidEnumException();
+    /**
+     * reads average point from input
+     * @return
+     * @throws InvalidNumberException
+     */
+    public Double readAveragePoint() throws InvalidNumberException, InvalidInputCharacterException {
+        Double averagePoint;
+        try{
+            averagePoint = Double.parseDouble(scannerNextLine());
+            if (averagePoint != null && (averagePoint <= 0)) throw new InvalidNumberException();
+        }
+        catch(NumberFormatException e){
+            throw new InvalidNumberException();
+        }
+        return averagePoint;
+    }
+
+    public Difficulty readDifficulty() throws InvalidEnumException, InvalidInputCharacterException {
+        String s;
+        try{
+            s = scannerNextLine();
+            switch (s) {
+                case "1":
+                    return Difficulty.values()[0];
+                case "2":
+                    return Difficulty.values()[1];
+                case "3":
+                    return Difficulty.values()[2];
+                case "4":
+                    return Difficulty.values()[3];
+                default:
+                    return Difficulty.valueOf(s);
             }
-        }
-    }
-
-    public Status readStatus() throws InvalidEnumException {
-        String s = read();
-        try {
-            return Status.valueOf(s);
-        } catch (IllegalArgumentException e) {
+        } catch(IllegalArgumentException e){
             throw new InvalidEnumException();
         }
     }
 
-    public OrganizationType readOrganizationType() throws InvalidEnumException {
-        String s = read();
-        try {
-            return OrganizationType.valueOf(s);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidEnumException();
+    public Integer readLectureHours() throws InvalidNumberException, InvalidInputCharacterException {
+        Integer lectureHours;
+        try{
+            lectureHours = Integer.parseInt(scannerNextLine());
         }
+        catch(NumberFormatException e){
+            throw new InvalidNumberException();
+        }
+        return lectureHours;
     }
 
-    public Organization readOrganization() throws InvalidDataException {
-        String fullName = readFullName();
-        OrganizationType orgType = readOrganizationType();
-        return new Organization(fullName, orgType);
+    public Discipline readDiscipline() throws InvalidDataException{
+        String name = readName();
+        Integer lectureHours = readLectureHours();
+        return new Discipline(name, lectureHours);
     }
 
-    public Worker readWorker() throws InvalidDataException {
-        Worker worker = null;
+    public LabWork readLabWork() throws InvalidDataException{
+        LabWork labWork = null;
 
         String name = readName();
         Coordinates coords = readCoords();
-        long salary = readSalary();
-        LocalDate date = readEndDate();
-        Position pos = readPosition();
-        Status stat = readStatus();
-        Organization org = readOrganization();
-        worker = new DefaultWorker(name, coords, salary, date, pos, stat, org);
+        Integer minimalPoint = readMinimalPoint();
+        int personalQualitiesMinimum = readPersonalQualitiesMinimum();
+        Double averagePoint = readAveragePoint();
+        Difficulty difficulty = readDifficulty();
+        Discipline discipline = readDiscipline();
+        labWork = new LabWork(name, coords, minimalPoint, personalQualitiesMinimum, averagePoint, difficulty, discipline);
 
-        return worker;
-
+        return labWork;
     }
 
     public String readPassword() throws InvalidDataException {
-        String s = read();
+        String s = scannerNextLine();
         if (s.equals("")) throw new EmptyStringException();
         return s;
     }
 
     public String readLogin() throws InvalidDataException {
-        String s = read();
+        String s = scannerNextLine();
         if (s.equals("")) throw new EmptyStringException();
         return s;
     }
@@ -173,28 +186,34 @@ public abstract class InputManagerImpl implements InputManager {
         return new User(readPassword(), readLogin());
     }
 
-    public CommandMsg readCommand() {
-        String cmd = read();
+    public CommandMsg readCommand() throws InvalidInputCharacterException {
+        String cmd = scannerNextLine();
         String arg = null;
-        Worker worker = null;
+        LabWork labWork = null;
         User user = null;
-        if (cmd.contains(" ")) { //if command has argument
-            String[] arr = cmd.split(" ", 2);
-            cmd = arr[0];
-            arg = arr[1];
+        if (cmd.contains(" ")){ //if command has argument
+            String commandLine [] = cmd.split(" ",TWICE);
+            cmd = commandLine[THE_FIRST_PART];
+            arg = commandLine[THE_SECOND_PART];
         }
-        if (cmd.equals("add") || cmd.equals("add_if_min") || cmd.equals("add_if_max") || cmd.equals("update")) {
-            try {
-                worker = readWorker();
-            } catch (InvalidDataException ignored) {
-            }
-        } else if (cmd.equals("login") || cmd.equals("register")) {
+        if (cmd.equals("login") || cmd.equals("register")) {
             try {
                 user = readUser();
             } catch (InvalidDataException ignored) {
             }
             return new CommandMsg(cmd, null, null, user);
         }
-        return new CommandMsg(cmd, arg, worker);
+        return new CommandMsg(cmd, arg, labWork);
+    }
+
+    protected String scannerNextLine() throws InvalidInputCharacterException {
+        String value = "";
+        try {
+            value = scanner.nextLine().replace(",", ".").trim();
+        }
+        catch (NoSuchElementException e){
+            throw new InvalidInputCharacterException();
+        }
+        return value;
     }
 }

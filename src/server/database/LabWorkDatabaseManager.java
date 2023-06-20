@@ -6,7 +6,6 @@ import common.exceptions.*;
 import common.utils.DateConverter;
 import server.auth.UserManager;
 import server.collection.LabWorkCollectionManager;
-import server.collection.LabWorkDequeManager;
 import server.log.Log;
 
 import java.sql.PreparedStatement;

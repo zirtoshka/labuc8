@@ -1,22 +1,19 @@
 package server.collection;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
+import java.util.*;
+import java.lang.reflect.Type;
+import java.util.stream.Collectors;
+
 import common.data.LabWork;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.NoSuchIdException;
-import server.json.CollectionDeserializer;
-import server.json.DateDeserializer;
-import server.json.DateSerializer;
+import server.json.*;
 
-import java.lang.reflect.Type;
-import java.util.*;
-import java.util.stream.Collectors;
+import static common.io.OutputManager.*;
 
-import static common.io.ConsoleOutputter.print;
-import static common.io.ConsoleOutputter.printErr;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+
 
 /**
  * Operates collection.
@@ -36,6 +33,7 @@ public class LabWorkCollectionManager implements CollectionManager<LabWork>{
         collection = new Stack<>();
         initDate = java.time.LocalDateTime.now();
     }
+
     public Integer generateNextId(){
 
         if (collection.isEmpty())
@@ -51,6 +49,7 @@ public class LabWorkCollectionManager implements CollectionManager<LabWork>{
             return id;
         }
     }
+
     public void sort(){
         Collections.sort(collection, new LabWork.SortingComparator());
     }
@@ -64,16 +63,16 @@ public class LabWorkCollectionManager implements CollectionManager<LabWork>{
         return collection;
     }
 
-/**
- * Add element to collection
- * @param labWork Element of collection
- */
-public void add(LabWork labWork){
-    labWork.setId(generateNextId());
-    collection.push(labWork);
-    print("Added element:");
-    print(labWork.toString());
-}
+    /**
+     * Add element to collection
+     * @param labWork Element of collection
+     */
+    public void add(LabWork labWork){
+        labWork.setId(generateNextId());
+        collection.push(labWork);
+        print("Added element:");
+        print(labWork.toString());
+    }
 
     @Override
     public LabWork getById(Integer id) {
@@ -86,6 +85,7 @@ public void add(LabWork labWork){
         }
         return labWork.get();
     }
+
     protected void addWithoutIdGeneration(LabWork labWork){
         uniqueIds.add(labWork.getId());
         collection.add(labWork);
@@ -108,6 +108,7 @@ public void add(LabWork labWork){
         if (uniqueIds.contains(id)) return true;
         return false;
     }
+
     /**
      * Delete element by id
      * @param id
@@ -125,23 +126,23 @@ public void add(LabWork labWork){
         return false;
     }
 
-/**
- * Delete element by id
- * @param id
- */
-public boolean updateById(Integer id, LabWork newLabWork){
-    int currentId = THE_FIRST_ID;
-    for (LabWork labWork : collection){
-        if (labWork.getId() == id){
-            newLabWork.setId(id);
-            collection.set(currentId - 1, newLabWork);
-            //print("element #"+Integer.toString(id)+" successfully updated");
-            return true;
+    /**
+     * Delete element by id
+     * @param id
+     */
+    public boolean updateById(Integer id, LabWork newLabWork){
+        int currentId = THE_FIRST_ID;
+        for (LabWork labWork : collection){
+            if (labWork.getId() == id){
+                newLabWork.setId(id);
+                collection.set(currentId - 1, newLabWork);
+                //print("element #"+Integer.toString(id)+" successfully updated");
+                return true;
+            }
+            currentId += 1;
         }
-        currentId += 1;
+        return false;
     }
-    return false;
-}
 
     /**
      * Get size of collection
@@ -150,6 +151,8 @@ public boolean updateById(Integer id, LabWork newLabWork){
     public int getSize(){
         return collection.size();
     }
+
+
     public void clear(){
         collection.clear();
         uniqueIds.clear();
@@ -170,31 +173,31 @@ public boolean updateById(Integer id, LabWork newLabWork){
         return true;
     }
 
-/**
- * Remove elements in collection if id of elements smaller then that
- * @param newLabWork Element
- */
-public boolean removeLower(LabWork newLabWork){
-    boolean isHappened = false;
-    for (LabWork labWork : collection){
-        if (newLabWork.compareTo(labWork) > 0){
-            collection.remove(labWork);
-            isHappened = true;
+    /**
+     * Remove elements in collection if id of elements smaller then that
+     * @param newLabWork Element
+     */
+    public boolean removeLower(LabWork newLabWork){
+        boolean isHappened = false;
+        for (LabWork labWork : collection){
+            if (newLabWork.compareTo(labWork) > 0){
+                collection.remove(labWork);
+                isHappened = true;
+            }
         }
+        return isHappened;
     }
-    return isHappened;
-}
 
-/**
- * Print if field personalQualitiesMinimum is min in collection
- *
- * @return
- */
-public String minByPersonalQualitiesMinimum(){
-    return collection.stream()
-            .min(Comparator.comparing(LabWork::getPersonalQualitiesMinimum))
-            .get().toString();
-}
+    /**
+     * Print if field personalQualitiesMinimum is min in collection
+     *
+     * @return
+     */
+    public String minByPersonalQualitiesMinimum(){
+        return collection.stream()
+                .min(Comparator.comparing(LabWork::getPersonalQualitiesMinimum))
+                .get().toString();
+    }
 
     /**
      * Print if field discipline is max in collection
@@ -214,6 +217,7 @@ public String minByPersonalQualitiesMinimum(){
                 .collect(Collectors.toList());
         return list;
     }
+
     protected void removeAll(Collection<Integer> ids){
         Iterator<Integer> iterator = ids.iterator();
         while (iterator.hasNext()){
@@ -222,6 +226,7 @@ public String minByPersonalQualitiesMinimum(){
             iterator.remove();
         }
     }
+
     public boolean deserializeCollection(String jsonData){
         boolean success = true;
         try {
@@ -243,6 +248,7 @@ public String minByPersonalQualitiesMinimum(){
         }
         return success;
     }
+
     public String serializeCollection(){
         if (collection == null || collection.isEmpty()) return "";
         Gson collectionData = new GsonBuilder()

@@ -1,10 +1,10 @@
 package common.exceptions;
-
 /**
- * thrown when input doesnt match enum
+ * thrown when input does not match enum
  */
-public class InvalidEnumException extends InvalidDataException {
-    public InvalidEnumException() {
-        super("wrong constant");
+public class InvalidEnumException extends InvalidDataException{
+    private static final String message = "wrong constant";
+    public InvalidEnumException(){
+        super(message);
     }
 }

@@ -7,6 +7,7 @@ import common.data.LabWork;
 import common.exceptions.CannotAddException;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.NoSuchIdException;
+import server.collection.CollectionManager;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Operates collection.
  */
-public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implements LabWorkManager {
+public abstract class LabWorkManagerImpl<T extends Collection<LabWork>>  {
 
     private final java.time.LocalDateTime initDate;
 
@@ -27,7 +28,7 @@ public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implemen
         initDate = java.time.LocalDateTime.now();
     }
 
-    public int generateNextId() {
+    public Integer generateNextId() {
         if (getCollection().isEmpty())
             return 1;
         else {
@@ -38,7 +39,6 @@ public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implemen
             return id;
         }
     }
-
     public void sort() {
         //collection = collection.stream().sorted(new Worker.SortingComparator()).collect(Collectors.toCollection(LinkedList::new));
     }
@@ -62,7 +62,6 @@ public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implemen
         labWork.setId(id);
         getCollection().add(labWork);
     }
-
     public LabWork getByID(Integer id){
         assertNotEmpty();
         Optional<LabWork> labWork = getCollection().stream()
@@ -210,12 +209,10 @@ public abstract class LabWorkManagerImpl<T extends Collection<LabWork>> implemen
 
 
 
-    @Override
     public void deserializeCollection(String data) {
 
     }
 
-    @Override
     public String serializeCollection() {
         return null;
     }

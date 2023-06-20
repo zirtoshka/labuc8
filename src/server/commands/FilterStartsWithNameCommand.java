@@ -1,29 +1,31 @@
 package server.commands;
 
-import common.collection.LabWorkManager;
-import common.commands.CommandImpl;
-import common.commands.CommandType;
-import common.data.Worker;
-import common.exceptions.MissedCommandArgumentException;
-
 import java.util.List;
 
-public class FilterStartsWithNameCommand extends CommandImpl {
-    private final LabWorkManager collectionManager;
 
-    public FilterStartsWithNameCommand(LabWorkManager cm) {
+import common.commands.core.CommandImpl;
+import common.commands.core.CommandType;
+import common.data.*;
+import common.exceptions.*;
+import server.collection.CollectionManager;
+
+public class FilterStartsWithNameCommand extends CommandImpl {
+    private CollectionManager<LabWork> collectionManager;
+    public FilterStartsWithNameCommand(CollectionManager<LabWork> cm){
         super("filter_starts_with_name", CommandType.NORMAL);
         collectionManager = cm;
     }
 
     @Override
-    public String execute() {
-        if (!hasStringArg()) throw new MissedCommandArgumentException();
+    public String execute(){
+        if(!hasStringArg()) throw new MissedCommandArgumentException();
+        if (collectionManager.getCollection().isEmpty()) throw new EmptyCollectionException();
         String start = getStringArg();
-        List<Worker> list = collectionManager.filterStartsWithName(getStringArg());
-        if (list.isEmpty()) return "none of elements have name which starts with " + start;
-        return list.stream()
-                .sorted(new Worker.SortingComparator())
-                .map(Worker::toString).reduce("", (a, b) -> a + b + "\n");
+        List<LabWork> list = collectionManager.filterStartsWithName(getStringArg());
+        if(list.isEmpty()) return "none of elements have name which starts with " + start;
+        String s = list.stream()
+                .sorted(new LabWork.SortingComparator())
+                .map(e -> e.toString()).reduce("", (a,b)->a + b + "\n");
+        return s;
     }
 }

@@ -6,13 +6,14 @@ import common.exceptions.InvalidFieldException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 
 /**
  * LabWork class
  */
-public class LabWork implements Collectionable, Serializable {
+public class LabWork implements Collectionable, Serializable, Collection<LabWork> {
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null

@@ -1,7 +1,8 @@
 package server.commands;
 
-import common.commands.CommandImpl;
-import common.commands.CommandType;
+
+import common.commands.core.CommandImpl;
+import common.commands.core.CommandType;
 import common.exceptions.AuthException;
 import server.auth.UserManager;
 

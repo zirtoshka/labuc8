@@ -1,8 +1,9 @@
 package server.commands;
 
 import common.auth.User;
-import common.commands.CommandImpl;
-import common.commands.CommandType;
+
+import common.commands.core.CommandImpl;
+import common.commands.core.CommandType;
 import common.connection.AnswerMsg;
 import common.connection.Response;
 import common.exceptions.DatabaseException;

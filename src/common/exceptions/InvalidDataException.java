@@ -1,9 +1,8 @@
 package common.exceptions;
-
 /**
- * base class for exceptions caused by invalid data
+ * base class for all exceptions caused by invalid input
  */
-public class InvalidDataException extends Exception {
+public class InvalidDataException extends Exception{
     public InvalidDataException(String message) {
         super(message);
     }

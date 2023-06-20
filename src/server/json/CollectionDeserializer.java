@@ -1,74 +1,67 @@
 package server.json;
 
 import java.lang.reflect.Type;
-import java.util.Deque;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.HashSet;
+import java.util.Stack;
 
-import common.data.*;
+import common.data.LabWork;
 import com.google.gson.*;
-import server.log.Log;
 
+import static common.io.OutputManager.printErr;
 
 /**
  * type adapter for json deserialization
  */
-public class CollectionDeserializer implements JsonDeserializer<Deque<Worker>> {
-    private final Set<Integer> uniqueIds;
+public class CollectionDeserializer implements JsonDeserializer<Stack<LabWork>>{
+    private HashSet<Integer> uniqueIds;
 
     /**
      * constructor
-     *
      * @param uniqueIds set of ids. useful for generating new id
      */
-    public CollectionDeserializer(Set<Integer> uniqueIds) {
+    public CollectionDeserializer(HashSet<Integer> uniqueIds){
         this.uniqueIds = uniqueIds;
     }
-
     @Override
-    public Deque<Worker> deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
-        Deque<Worker> collection = new ConcurrentLinkedDeque<>();
-        JsonArray workers = json.getAsJsonArray();
+    public Stack<LabWork> deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+        Stack<LabWork> collection = new Stack<>();
+        JsonArray labWorks = json.getAsJsonArray();
         int damagedElements = 0;
-        for (JsonElement jsonWorker : workers) {
-            Worker worker = null;
-            try {
-                if (jsonWorker.getAsJsonObject().entrySet().isEmpty()) {
-                    Log.logger.error("empty worker found");
-                    throw new JsonParseException("empty worker");
+        for (JsonElement jsonLabWork: labWorks){
+            LabWork labWork = null;
+            try{
+                if (jsonLabWork.getAsJsonObject().entrySet().isEmpty()){
+                    printErr("empty labWork found");
+                    throw new JsonParseException("empty LabWork");
                 }
-                if (!jsonWorker.getAsJsonObject().has("id")) {
-                    Log.logger.error("found worker without id");
+                if (!jsonLabWork.getAsJsonObject().has("id")) {
+                    printErr("found labWork without id");
                     throw new JsonParseException("no id");
                 }
-                worker = context.deserialize(jsonWorker, Worker.class);
+                labWork = (LabWork) context.deserialize(jsonLabWork, LabWork.class);
 
-                Integer id = worker.getId();
+                Integer id = labWork.getId();
 
                 if (uniqueIds.contains(id)) {
-                    Log.logger.error("database already contains worker with id #" + id);
-                    throw new JsonParseException("id isnt unique");
+                    printErr("data already contains LabWork with id #" + Integer.toString(id));
+                    throw new JsonParseException("id is not unique");
                 }
-                if (!worker.validate()) {
-                    Log.logger.error("worker #" + id + " doesnt match specific conditions");
-                    throw new JsonParseException("invalid worker data");
+                if (!labWork.validate()) {
+                    printErr("labWork #"+Integer.toString(id) + " doesnt match specific conditions");
+                    throw new JsonParseException("invalid labWork data");
                 }
                 uniqueIds.add(id);
-                collection.add(worker);
-            } catch (JsonParseException e) {
+                collection.add(labWork);
+            } catch (JsonParseException e){
                 damagedElements += 1;
             }
         }
-        if (collection.size() == 0) {
-            if (damagedElements == 0) Log.logger.error("database is empty");
-            else Log.logger.error("all elements in database are damaged");
+        if (collection.size()==0){
+            if (damagedElements == 0) printErr("data is empty");
+            else printErr("all elements in data are damaged");
             throw new JsonParseException("no data");
         }
-        if (damagedElements != 0)
-            Log.logger.error(damagedElements + " elements in database are damaged");
+        if (damagedElements != 0) printErr(Integer.toString(damagedElements) + " elements in data are damaged");
         return collection;
     }
 }

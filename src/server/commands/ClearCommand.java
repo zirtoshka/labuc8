@@ -1,32 +1,29 @@
 package server.commands;
 
-import common.collection.LabWorkManager;
 import common.auth.User;
-import common.commands.CommandImpl;
-import common.commands.CommandType;
-import common.connection.AnswerMsg;
-import common.connection.CollectionOperation;
-import common.connection.Response;
+
+import common.commands.core.CommandImpl;
+import common.commands.core.CommandType;
+import common.data.LabWork;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.InvalidDataException;
+import server.collection.CollectionManager;
 import server.database.LabWorkDatabaseManager;
 
 public class ClearCommand extends CommandImpl {
     private final LabWorkDatabaseManager collectionManager;
 
-    public ClearCommand(LabWorkManager cm) {
-        super("clear", CommandType.NORMAL, CollectionOperation.REMOVE);
+    public ClearCommand(CollectionManager<LabWork> cm) {
+        super("clear", CommandType.NORMAL);
         collectionManager = (LabWorkDatabaseManager) cm;
     }
 
     @Override
-    public Response run() throws InvalidDataException {
-        AnswerMsg answerMsg = new AnswerMsg();
+    public String execute() throws InvalidDataException {
         if (collectionManager.getCollection().isEmpty()) throw new EmptyCollectionException();
         User user = getArgument().getUser();
-        answerMsg.setCollection(collectionManager.clear(user));
-        answerMsg.info( "collection cleared");
-        return answerMsg;
+        collectionManager.clear(user);
+        return "collection cleared";
     }
 
 }

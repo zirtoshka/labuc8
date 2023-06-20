@@ -246,18 +246,18 @@ public class Client extends Thread implements SenderReceiver {
                     case EXIT:
                         connected=false;
                         print("server shut down");
-                        outputManager.error("[ServerShutDown]");
+                        outputManager.printErr("[ServerShutDown]");
                         break;
                         //TODO when server closed exit on login
                     case FINE:
                         try {
-                            outputManager.info(msg);
+                            outputManager.print(msg);
                         } catch (ResourceException ignored){
 
                         }
                         break;
                     case ERROR:
-                        outputManager.error(msg);
+                        outputManager.printErr(msg);
 
                     default:
                         print(msg);
@@ -300,10 +300,10 @@ public class Client extends Thread implements SenderReceiver {
             if (authSuccess) {
                 user = attempt;
             } else {
-                outputManager.error(!register?"[AuthException]":"[RegisterException] " + "[" + getAttemptUser() + "]");
+                outputManager.printErr(!register?"[AuthException]":"[RegisterException] " + "[" + getAttemptUser() + "]");
             }
         } catch (ConnectionTimeoutException e){
-            outputManager.error("[TimeoutException]");
+            outputManager.printErr("[TimeoutException]");
             connected = false;
         } catch (ConnectionException|InvalidDataException e) {
             connected=false;

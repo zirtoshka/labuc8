@@ -1,5 +1,4 @@
 package common.exceptions;
-
 /**
  * thrown when field is invalid
  */

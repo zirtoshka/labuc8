@@ -1,10 +1,10 @@
 package common.exceptions;
-
 /**
- * thrown when file doesnt exist
+ * thrown when file does not exist
  */
-public class FileNotExistsException extends FileException {
-    public FileNotExistsException() {
-        super("cannot find file");
+public class FileNotExistsException extends FileException{
+    private static final String message = "cannot find file";
+    public FileNotExistsException(){
+        super(message);
     }
 }

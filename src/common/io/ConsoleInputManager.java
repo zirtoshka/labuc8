@@ -1,80 +1,89 @@
 package common.io;
 
 import common.auth.User;
-import common.data.*;
+import common.data.Coordinates;
+import common.data.Difficulty;
+import common.data.Discipline;
+import common.data.LabWork;
+import common.exceptions.InvalidFieldException;
+import common.exceptions.InvalidInputCharacterException;
+import common.exceptions.InvalidNumberException;
 
-import java.time.LocalDate;
 import java.util.Scanner;
+public class ConsoleInputManager extends InputManagerImpl{
 
-import static common.io.ConsoleOutputter.print;
-
-public class ConsoleInputManager extends InputManagerImpl {
-
-    public ConsoleInputManager() {
+    public ConsoleInputManager(){
         super(new Scanner(System.in));
-        getScanner().useDelimiter("\n");
     }
 
     @Override
-    public String readName() {
-        return new Question<String>("enter name:", super::readName).getAnswer();
+    public String readName() throws InvalidInputCharacterException {
+        return new Question<String>("enter name (value must be not empty):", super::readName).getAnswer();
+    }
+
+
+    @Override
+    public double readXCoord() throws InvalidInputCharacterException {
+        return new Question<Double>("enter x:", super::readXCoord).getAnswer();
     }
 
     @Override
-    public String readFullName() {
-        return new Question<String>("enter name:", super::readFullName).getAnswer();
+    public Integer readYCoord() throws InvalidInputCharacterException {
+        return new Question<Integer>("enter y (value must be bigger than -545):", super::readYCoord).getAnswer();
     }
 
     @Override
-    public float readXCoord() {
-        return new Question<Float>("enter x:", super::readXCoord).getAnswer();
-    }
-
-    @Override
-    public Long readYCoord() {
-        return new Question<Long>("enter y:", super::readYCoord).getAnswer();
-    }
-
-    @Override
-    public Coordinates readCoords() {
-        print("enter coordinates");
-        float x = readXCoord();
-        Long y = readYCoord();
-        Coordinates coord = new Coordinates(x, y);
+    public Coordinates readCoords() throws InvalidNumberException, InvalidInputCharacterException {
+        OutputManager.print("enter coordinates");
+        double x = readXCoord();
+        Integer y = readYCoord();
+        Coordinates coord = new Coordinates(x,y);
         return coord;
     }
 
     @Override
-    public long readSalary() {
-        return new Question<Long>("enter salary:", super::readSalary).getAnswer();
+    public Integer readMinimalPoint() throws InvalidInputCharacterException {
+        return new Question<Integer>("enter minimal point (value must be bigger than 0):",super::readMinimalPoint).getAnswer();
     }
 
     @Override
-    public LocalDate readEndDate() {
-        return new Question<LocalDate>("enter endDate:", super::readEndDate).getAnswer();
+    public int readPersonalQualitiesMinimum() throws InvalidInputCharacterException {
+        return new Question<Integer>("enter personal qualities minimum (value must be bigger than 0):",super::readPersonalQualitiesMinimum).getAnswer();
     }
 
     @Override
-    public Position readPosition() {
-        return new Question<Position>("enter position(DIRECTOR, MANAGER, ENGINEER, BAKER):", super::readPosition).getAnswer();
+    public Double readAveragePoint() throws InvalidInputCharacterException {
+        return new Question<Double>("enter average point (value must be bigger than 0):",super::readAveragePoint).getAnswer();
     }
 
     @Override
-    public Status readStatus() {
-        return new Question<Status>("enter status(RECOMMENDED_FOR_PROMOTION, REGULAR, PROBATION):", super::readStatus).getAnswer();
+    public Difficulty readDifficulty() throws InvalidInputCharacterException {
+        return new Question<Difficulty>("enter difficulty(VERY_HARD, IMPOSSIBLE, HOPELESS, TERRIBLE):", super::readDifficulty).getAnswer();
     }
 
     @Override
-    public OrganizationType readOrganizationType() {
-        return new Question<OrganizationType>("enter organization type(PUBLIC, GOVERNMENT, PRIVATE_LIMITED_COMPANY, OPEN_JOINT_STOCK_COMPANY):", super::readOrganizationType).getAnswer();
+    public Integer readLectureHours() throws InvalidInputCharacterException {
+        return new Question<Integer>("enter lecture hours:",super::readLectureHours).getAnswer();
     }
 
     @Override
-    public Organization readOrganization() {
-        print("enter organization");
-        String fullName = readFullName();
-        OrganizationType orgType = readOrganizationType();
-        return new Organization(fullName, orgType);
+    public Discipline readDiscipline() throws InvalidFieldException, InvalidInputCharacterException {
+        OutputManager.print("enter discipline");
+        String name = readName();
+        Integer lectureHours = readLectureHours();
+        return new Discipline(name, lectureHours);
+    }
+
+    @Override
+    public LabWork readLabWork() throws InvalidNumberException, InvalidFieldException, InvalidInputCharacterException {
+        String name = readName();
+        Coordinates coords = readCoords();
+        Integer minimalPoint = readMinimalPoint();
+        int personalQualitiesMinimum = readPersonalQualitiesMinimum();
+        Double averagePoint = readAveragePoint();
+        Difficulty difficulty = readDifficulty();
+        Discipline discipline = readDiscipline();
+        return new LabWork(name, coords, minimalPoint, personalQualitiesMinimum, averagePoint, difficulty, discipline);
     }
 
     @Override
@@ -93,5 +102,4 @@ public class ConsoleInputManager extends InputManagerImpl {
         String password = readPassword();
         return new User(login, password);
     }
-
 }

@@ -6,6 +6,6 @@ public class AuthException extends ConnectionException {
     }
 
     public AuthException() {
-        super("[AuthException] no such user, or user login or password is incorrect");
+        super("no such user, or user login or password is incorrect");
     }
 }

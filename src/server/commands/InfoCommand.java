@@ -1,20 +1,24 @@
 package server.commands;
 
-import common.collection.LabWorkManager;
-import common.commands.CommandImpl;
-import common.commands.CommandType;
+
+
+
+import common.collection.LabWorkManagerImpl;
+import common.commands.core.CommandImpl;
+import common.commands.core.CommandType;
+import common.exceptions.*;
+import common.data.*;
+import server.collection.LabWorkCollectionManager;
 
 public class InfoCommand extends CommandImpl {
-    private final LabWorkManager collectionManager;
-
-    public InfoCommand(LabWorkManager cm) {
+    private LabWorkCollectionManager collectionManager;
+    public InfoCommand(LabWorkCollectionManager labWorkCollectionManager){
         super("info", CommandType.NORMAL);
-        collectionManager = cm;//TODO
+        collectionManager = labWorkCollectionManager;
     }
 
     @Override
-    public String execute() {
+    public String execute() throws InvalidDataException {
         return collectionManager.getInfo();
     }
-
 }

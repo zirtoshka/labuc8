@@ -1,4 +1,4 @@
-package common.commands;
+package common.commands.core;
 
 /**
  * command types

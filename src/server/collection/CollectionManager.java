@@ -1,7 +1,7 @@
 package server.collection;
-
 import common.data.LabWork;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
@@ -18,13 +18,13 @@ public interface CollectionManager<T> {
 
     public void sort();
 
-    public Stack<T> getCollection();
+    public Collection<T> getCollection();
 
     /**
      * adds new element
      * @param element
      */
-    public void add(T element);
+    public void add(LabWork element);
 
     /**
      * get information about collection
@@ -60,7 +60,7 @@ public interface CollectionManager<T> {
 
     public void clear();
 
-    public T getById(Integer id);
+    public LabWork getById(Integer id);
     /**
      * adds element if it is greater than max
      * @param element

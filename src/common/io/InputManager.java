@@ -1,122 +1,101 @@
 package common.io;
 
+import java.util.Scanner;
+
 import common.auth.User;
 import common.connection.CommandMsg;
 import common.data.*;
 import common.exceptions.*;
 
-import java.time.LocalDate;
-import java.util.Scanner;
-
 public interface InputManager {
     /**
      * reads name from input
-     *
      * @return
      * @throws EmptyStringException
      */
-    String readName() throws EmptyStringException;
-
-    /**
-     * reads fullName from input
-     *
-     * @return
-     */
-    String readFullName();
+    public String readName() throws EmptyStringException, InvalidInputCharacterException;
 
     /**
      * reads x from input
-     *
      * @return
      * @throws InvalidNumberException
      */
-    float readXCoord() throws InvalidNumberException;
+    public double readXCoord() throws InvalidNumberException, InvalidInputCharacterException;
 
     /**
      * reads y from input
-     *
      * @return
-     * @throws InvalidNumberException`
+     * @throws InvalidNumberException
      */
-    Long readYCoord() throws InvalidNumberException;
+    public Integer readYCoord() throws InvalidNumberException, InvalidInputCharacterException;
 
     /**
      * reads coordinates from input
-     *
      * @return
      * @throws InvalidNumberException
      */
-    Coordinates readCoords() throws InvalidNumberException;
+    public Coordinates readCoords() throws InvalidNumberException, InvalidInputCharacterException;
 
     /**
-     * reads salary from input
-     *
+     * reads minimal point from input
      * @return
      * @throws InvalidNumberException
      */
-    long readSalary() throws InvalidNumberException;
+    public Integer readMinimalPoint() throws InvalidNumberException, InvalidInputCharacterException;
 
     /**
-     * reads endDate from input
-     *
+     * reads personal qualities minimum from input
      * @return
-     * @throws InvalidDateFormatException
+     * @throws InvalidNumberException
      */
-    LocalDate readEndDate() throws InvalidDateFormatException;
+    public int readPersonalQualitiesMinimum() throws InvalidNumberException, InvalidInputCharacterException;
+
+    /**
+     * reads average point from input
+     * @return
+     * @throws InvalidNumberException
+     */
+    public Double readAveragePoint() throws InvalidNumberException, InvalidInputCharacterException;
 
     /**
      * reads position from input
-     *
      * @return
      * @throws InvalidEnumException
      */
-    Position readPosition() throws InvalidEnumException;
+    public Difficulty readDifficulty() throws InvalidEnumException, InvalidInputCharacterException;
 
     /**
-     * reads status from input
-     *
+     * reads lecture hours from input
      * @return
-     * @throws InvalidEnumException
+     * @throws InvalidNumberException
      */
-    Status readStatus() throws InvalidEnumException;
-
-    /**
-     * reads organizationType from input
-     *
-     * @return
-     * @throws InvalidEnumException
-     */
-    OrganizationType readOrganizationType() throws InvalidEnumException;
+    public Integer readLectureHours() throws InvalidNumberException, InvalidInputCharacterException;
 
     /**
      * reads organization from input
-     *
      * @return
      * @throws InvalidDataException
      */
-    Organization readOrganization() throws InvalidDataException;
+    public Discipline readDiscipline() throws InvalidDataException;
 
     /**
-     * reads Worker from input
-     *
+     * reads LabWork from input
      * @return
      * @throws InvalidDataException
      */
-    Worker readWorker() throws InvalidDataException;
+    public LabWork readLabWork() throws InvalidDataException;
 
     /**
      * reads command-argument pair from input
      *
      * @return
      */
-    CommandMsg readCommand();
+    public CommandMsg readCommand() throws InvalidInputCharacterException;
 
     /**
      * gets input scanner
-     *
      * @return
      */
-
     boolean hasNextLine();
 
 

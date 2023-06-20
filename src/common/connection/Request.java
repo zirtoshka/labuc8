@@ -4,6 +4,7 @@ import common.auth.User;
 import common.data.LabWork;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 
 public interface Request extends Serializable {
     String getStringArg();
@@ -17,6 +18,7 @@ public interface Request extends Serializable {
     Request setUser(User usr);
 
     Status getStatus();
+    InetSocketAddress getBroadcastAddress();
 
     Request setStatus(Status s);
 

@@ -1,43 +1,41 @@
 package server.commands;
 
-import common.collection.LabWorkManager;
 import common.auth.User;
-import common.commands.CommandImpl;
-import common.commands.CommandType;
-import common.connection.AnswerMsg;
-import common.connection.CollectionOperation;
-import common.connection.Response;
+
+import common.commands.core.CommandImpl;
+import common.commands.core.CommandType;
 import common.exceptions.*;
+import common.data.*;
+import server.collection.CollectionManager;
+import server.exceptions.CheckIdException;
 
-import java.util.List;
-
-import static common.utils.Parser.parseId;
-
+import static common.utils.Parser.*;
 public class UpdateCommand extends CommandImpl {
-    private final LabWorkManager collectionManager;
-
-    public UpdateCommand(LabWorkManager cm) {
-        super("update", CommandType.NORMAL, CollectionOperation.UPDATE);
+    static private LabWork previous = null;
+    private CollectionManager<LabWork> collectionManager;
+    public UpdateCommand(CollectionManager<LabWork> cm){
+        super("update", CommandType.NORMAL);
         collectionManager = cm;
     }
 
-
     @Override
-    public Response run() throws InvalidDataException, AuthException {
+    public String execute() throws InvalidDataException, AuthException {
         User user = getArgument().getUser();
         if (collectionManager.getCollection().isEmpty()) throw new EmptyCollectionException();
-        if (!hasStringArg() || !hasWorkerArg()) throw new MissedCommandArgumentException();
+        if (!hasStringArg()) throw new MissedCommandArgumentException();
         Integer id = parseId(getStringArg());
-        if (!collectionManager.checkID(id)) throw new NoSuchIdException(id);
+        if (!collectionManager.checkId(id)) throw new InvalidCommandArgumentException("no such id");
+        String labWorkCreatorLogin = user.getLogin();
+        String owner = collectionManager.getById(id).getUserLogin();
 
-        String owner = collectionManager.getByID(id).getUserLogin();
-        String workerCreatorLogin = user.getLogin();
+        if (labWorkCreatorLogin == null || !labWorkCreatorLogin.equals(owner)) {
+            throw new AuthException("you dont have permission, element was created by " + owner);
+        }
 
-        if (workerCreatorLogin == null || !workerCreatorLogin.equals(owner))
-            throw new PermissionException(owner);
+        if (!hasLabWorkArg()) throw new CheckIdException();
 
-        collectionManager.updateByID(id, getLabWork());
-        return new AnswerMsg().info( "element #" + id + " updated").setCollection(List.of(getLabWork())).setCollectionOperation(CollectionOperation.UPDATE);
+        boolean success = collectionManager.updateById(id, getLabWorkArg());
+        if (success) return "element #" + Integer.toString(id) + " updated";
+        else throw new CommandException("cannot update");
     }
-
 }

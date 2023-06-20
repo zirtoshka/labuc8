@@ -1,18 +1,19 @@
 package server.commands;
 
-import common.collection.LabWorkManager;
-import common.auth.User;
-import common.commands.Command;
+
 import common.commands.CommandManager;
-import common.commands.CommandType;
+import common.commands.core.Command;
+import common.commands.core.CommandType;
+import common.data.LabWork;
+import server.auth.UserManager;
+import common.auth.User;
 import common.connection.AnswerMsg;
 import common.connection.Request;
 import common.connection.Response;
-import common.data.Worker;
 import common.exceptions.AuthException;
 import common.exceptions.CommandException;
 import common.exceptions.ConnectionException;
-import server.auth.UserManager;
+import server.collection.LabWorkCollectionManager;
 import server.log.Log;
 import server.server.Server;
 
@@ -23,26 +24,22 @@ public class ServerCommandManager extends CommandManager {
 
     public ServerCommandManager(Server serv) {
         server = serv;
-        LabWorkManager collectionManager = server.getCollectionManager();
+        LabWorkCollectionManager collectionManager = server.getCollectionManager();
         userManager = server.getUserManager();
-        addCommand(new ExitCommand());
-        addCommand(new HelpCommand());
-        addCommand(new ExecuteScriptCommand(this));
+        addCommand( new ExitCommand());
+        addCommand( new HelpCommand());
         addCommand(new InfoCommand(collectionManager));
         addCommand(new AddCommand(collectionManager));
-        addCommand(new AddIfMinCommand(collectionManager));
         addCommand(new AddIfMaxCommand(collectionManager));
         addCommand(new UpdateCommand(collectionManager));
         addCommand(new RemoveByIdCommand(collectionManager));
         addCommand(new ClearCommand(collectionManager));
-        addCommand(new RemoveFirstCommand(collectionManager));
         addCommand(new ShowCommand(collectionManager));
         addCommand(new FilterStartsWithNameCommand(collectionManager));
-        addCommand(new GroupCountingByEndDateCommand(collectionManager));
-        addCommand(new PrintUniqueSalaryCommand(collectionManager));
 
         addCommand(new LoginCommand(userManager));
         addCommand(new RegisterCommand(userManager));
+        addCommand(new LogoutCommand(userManager));
         addCommand(new ShowUsersCommand(userManager));
     }
 
@@ -68,8 +65,8 @@ public class ServerCommandManager extends CommandManager {
                 if (!userManager.isValid(user)) throw new AuthException();
 
                 //link user to worker
-                Worker worker = msg.getLabWork();
-                if (worker != null) worker.setUser(user);
+                LabWork labWork = msg.getLabWork();
+                if (labWork != null) labWork.setUser(user);
             }
 
             //executing command
@@ -87,7 +84,7 @@ public class ServerCommandManager extends CommandManager {
         if (res.getMessage().contains("\n")) message += "\n";
         switch (res.getStatus()) {
             case EXIT:
-                Log.logger.trace(message + "shutting down...");
+                Log.logger.info(message + "shutting down...");
                 server.close();
                 break;
             case ERROR:
@@ -95,8 +92,8 @@ public class ServerCommandManager extends CommandManager {
                 break;
             case AUTH_SUCCESS: //check if auth command was invoked by server terminal
                 if (isGeneratedByServer) server.setHostUser(user);
-                Log.logger.info(message + res.getMessage());
-                break;
+            case CHECK_ID:
+                if (msg.getLabWork() == null) ;
             default:
                 Log.logger.info(message + res.getMessage());
                 break;
