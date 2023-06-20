@@ -48,6 +48,7 @@ public class ObservableResourceFactory {
      * @return Binding string.
      */
     public StringBinding getStringBinding(String key) {
+
         return new StringBinding() {
             {
                 bind(resourcesProperty());
@@ -55,7 +56,12 @@ public class ObservableResourceFactory {
 
             @Override
             public String computeValue() {
-                return getResources().getString(key);
+                try {
+                    return getResources().getString(key);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return null;
+                }
             }
         };
     }

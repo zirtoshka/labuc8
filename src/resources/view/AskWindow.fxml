@@ -47,12 +47,18 @@
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="salaryLabel" layoutX="86.0" layoutY="157.0" text="HealthLabel" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+        <Label fx:id="minimalPointLabel" layoutX="86.0" layoutY="94.0" text="MinimalPointLabel" GridPane.halignment="CENTER" GridPane.rowIndex="3">
             <font>
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="positionLabel" layoutX="62.0" layoutY="220.0" text="CategoryLabel" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+
+        <Label fx:id="personalQualitiesMinimumLabel" layoutX="86.0" layoutY="157.0" text="PersonalQualitiesMinimumLabel" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+            <font>
+                <Font size="21.0" />
+            </font>
+        </Label>
+        <Label fx:id="difficultyLabel" layoutX="62.0" layoutY="220.0" text="DifficultyLabel" GridPane.halignment="CENTER" GridPane.rowIndex="5">
             <font>
                 <Font size="21.0" />
             </font>
@@ -62,30 +68,31 @@
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="statusLabel" layoutX="20.0" layoutY="31.0" text="WeaponLabel" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+        <Label fx:id="averagePointLabel" layoutX="20.0" layoutY="31.0" text="averagePointLabel" GridPane.halignment="CENTER" GridPane.rowIndex="7">
             <font>
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="organizationNameLabel" layoutX="53.0" layoutY="346.0" text="ChapterNameLabel" GridPane.halignment="CENTER" GridPane.rowIndex="7">
+        <Label fx:id="nameDisciplineLabel" layoutX="53.0" layoutY="346.0" text="nameDisciplineLabel" GridPane.halignment="CENTER" GridPane.rowIndex="8">
             <font>
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="endDateLabel" layoutX="25.0" layoutY="419.0" text="ChapterSizeLabel" GridPane.halignment="CENTER" GridPane.rowIndex="8">
+        <Label fx:id="lectureHoursDisciplineLabel" layoutX="53.0" layoutY="346.0" text="lectureHoursDisciplineLabel" GridPane.halignment="CENTER" GridPane.rowIndex="9">
             <font>
                 <Font size="21.0" />
             </font>
         </Label>
+
         <TextField fx:id="nameField" GridPane.columnIndex="1" />
         <TextField fx:id="coordinatesXField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
         <TextField fx:id="coordinatesYField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <TextField fx:id="salaryField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-        <TextField fx:id="organizationNameField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-        <TextField fx:id="endDateField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-        <ComboBox fx:id="positionBox" prefHeight="26.0" prefWidth="255.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-        <ComboBox fx:id="statusBox" prefHeight="26.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-        <ComboBox fx:id="organizationTypeBox" prefHeight="26.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+        <TextField fx:id="minimalPointField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <TextField fx:id="personalQualitiesMinimumField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <TextField fx:id="nameDisciplineField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        <TextField fx:id="averagePointField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+        <TextField fx:id="lectureHoursDisciplineField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+        <ComboBox fx:id="difficultyBox" prefHeight="26.0" prefWidth="255.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
         <Button fx:id="enterButton" mnemonicParsing="false" onAction="#enterButtonOnAction" prefWidth="128.0" text="EnterButton" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
     </GridPane>
 </AnchorPane>

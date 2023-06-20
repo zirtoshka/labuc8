@@ -76,15 +76,14 @@
                 </tooltip>
             </Button>
 
-         <Button fx:id="addIfMaxButton" mnemonicParsing="false" onAction="#addIfMaxButtonOnAction" text="AddIfMaxButton" />
-            <Button fx:id="groupByEndDateButton" mnemonicParsing="false" onAction="#groupByEndDateButtonOnAction" text="GroupByEndDateButton">
+         <Button fx:id="addIfMaxButton" mnemonicParsing="false" onAction="#addIfMaxButtonOnAction" text="AddIfMaxButton" >
                 <tooltip>
-                    <Tooltip fx:id="removeGreaterButtonTooltip" text="RemoveGreaterButtonTooltip" />
+                    <Tooltip fx:id="addIfMaxButtonTooltip" text="AddIfMaxButtonTooltip" />
                 </tooltip>
             </Button>
             <Button fx:id="filterStartsWithNameButton" mnemonicParsing="false" onAction="#filterStartsWithNameButtonOnAction" text="FilterStartsWithNameButton">
                 <tooltip>
-                    <Tooltip fx:id="historyButtonTooltip" text="HistoryButtonTooltip" />
+                    <Tooltip fx:id="filterStartsWithNameButtonTooltip" text="FilterStartsWithNameButtonTooltip" />
                 </tooltip>
             </Button>
 

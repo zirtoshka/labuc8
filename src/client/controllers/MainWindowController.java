@@ -63,6 +63,7 @@ public class MainWindowController {
     private final Duration ANIMATION_DURATION = Duration.millis(800);
     private final double MAX_SIZE = 100;
 
+
     @FXML
     private TableView<LabWork> labWorkTable;
     @FXML
@@ -138,6 +139,10 @@ public class MainWindowController {
     private Tooltip removeGreaterButtonTooltip;
     @FXML
     private Tooltip historyButtonTooltip;
+    @FXML
+    private Tooltip addIfMaxButtonTooltip;
+    @FXML
+    private Tooltip filterStartsWithNameButtonTooltip;
 
     @FXML
     private Tooltip refreshButtonTooltip;
