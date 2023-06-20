@@ -63,22 +63,18 @@
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="organizationTypeLabel" layoutX="50.0" layoutY="283.0" text="MeleeWeaponLabel" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+
+        <Label fx:id="averagePointLabel" layoutX="20.0" layoutY="31.0" text="averagePointLabel" GridPane.halignment="CENTER" GridPane.rowIndex="6">
             <font>
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="averagePointLabel" layoutX="20.0" layoutY="31.0" text="averagePointLabel" GridPane.halignment="CENTER" GridPane.rowIndex="7">
+        <Label fx:id="nameDisciplineLabel" layoutX="53.0" layoutY="346.0" text="nameDisciplineLabel" GridPane.halignment="CENTER" GridPane.rowIndex="7">
             <font>
                 <Font size="21.0" />
             </font>
         </Label>
-        <Label fx:id="nameDisciplineLabel" layoutX="53.0" layoutY="346.0" text="nameDisciplineLabel" GridPane.halignment="CENTER" GridPane.rowIndex="8">
-            <font>
-                <Font size="21.0" />
-            </font>
-        </Label>
-        <Label fx:id="lectureHoursDisciplineLabel" layoutX="53.0" layoutY="346.0" text="lectureHoursDisciplineLabel" GridPane.halignment="CENTER" GridPane.rowIndex="9">
+        <Label fx:id="lectureHoursDisciplineLabel" layoutX="53.0" layoutY="346.0" text="lectureHoursDisciplineLabel" GridPane.halignment="CENTER" GridPane.rowIndex="8">
             <font>
                 <Font size="21.0" />
             </font>
@@ -89,10 +85,10 @@
         <TextField fx:id="coordinatesYField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
         <TextField fx:id="minimalPointField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
         <TextField fx:id="personalQualitiesMinimumField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-        <TextField fx:id="nameDisciplineField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        <ComboBox fx:id="difficultyBox" prefHeight="26.0" prefWidth="255.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
         <TextField fx:id="averagePointField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-        <TextField fx:id="lectureHoursDisciplineField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-        <ComboBox fx:id="difficultyBox" prefHeight="26.0" prefWidth="255.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+        <TextField fx:id="nameDisciplineField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+        <TextField fx:id="lectureHoursDisciplineField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
         <Button fx:id="enterButton" mnemonicParsing="false" onAction="#enterButtonOnAction" prefWidth="128.0" text="EnterButton" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
     </GridPane>
 </AnchorPane>

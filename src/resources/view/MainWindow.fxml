@@ -14,17 +14,17 @@
                     <TableView fx:id="labWorkTable" prefHeight="598.0" prefWidth="445.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <columns>
                             <TableColumn fx:id="idColumn" prefWidth="153.0" text="IdColumn" />
-                            <TableColumn fx:id="ownerColumn" prefWidth="47.0" text="OwnerColumn" />
-                            <TableColumn fx:id="creationDateColumn" prefWidth="125.0" text="CreationDateColumn" />
                             <TableColumn fx:id="nameColumn" prefWidth="100.0" text="NameColumn" />
                             <TableColumn fx:id="coordinatesXColumn" prefWidth="30.0" text="CoordinatesXColumn" />
                             <TableColumn fx:id="coordinatesYColumn" prefWidth="30.0" text="CoordinatesYColumn" />
+                            <TableColumn fx:id="creationDateColumn" prefWidth="125.0" text="CreationDateColumn" />
                             <TableColumn fx:id="minimalPointColumn" prefWidth="75.0" text="MinimalPointColumn" />
                             <TableColumn fx:id="personalQualitiesMinimumColumn" prefWidth="100.0" text="personalQualitiesMinimumColumn" />
                             <TableColumn fx:id="averagePointColumn" prefWidth="125.0" text="averagePointColumn" />
                             <TableColumn fx:id="difficultyColumn" prefWidth="125.0" text="difficultyColumn" />
                             <TableColumn fx:id="nameDisciplineColumn" prefWidth="100.0" text="nameDisciplineColumn" />
                             <TableColumn fx:id="lectureHoursDisciplineColumn" prefWidth="100.0" text="lectureHoursDisciplineColumn" />
+                            <TableColumn fx:id="ownerColumn" prefWidth="47.0" text="OwnerColumn" />
                         </columns>
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -76,16 +76,7 @@
                 </tooltip>
             </Button>
 
-         <Button fx:id="addIfMaxButton" mnemonicParsing="false" onAction="#addIfMaxButtonOnAction" text="AddIfMaxButton" >
-                <tooltip>
-                    <Tooltip fx:id="addIfMaxButtonTooltip" text="AddIfMaxButtonTooltip" />
-                </tooltip>
-            </Button>
-            <Button fx:id="filterStartsWithNameButton" mnemonicParsing="false" onAction="#filterStartsWithNameButtonOnAction" text="FilterStartsWithNameButton">
-                <tooltip>
-                    <Tooltip fx:id="filterStartsWithNameButtonTooltip" text="FilterStartsWithNameButtonTooltip" />
-                </tooltip>
-            </Button>
+
 
         </FlowPane>
     </VBox>

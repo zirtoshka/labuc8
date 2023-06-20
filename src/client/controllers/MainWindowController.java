@@ -17,6 +17,7 @@ import common.utils.DateConverter;
 import javafx.animation.ScaleTransition;
 import javafx.collections.transformation.SortedList;
 import javafx.event.EventHandler;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.ScrollEvent;
@@ -39,12 +40,13 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.*;
 
 /**
  * Main window controller.
  */
-public class MainWindowController {
+public class MainWindowController implements Initializable {
     public static final String LOGIN_COMMAND_NAME = "login";
     public static final String REGISTER_COMMAND_NAME = "register";
     public static final String REFRESH_COMMAND_NAME = "refresh";
@@ -112,12 +114,6 @@ public class MainWindowController {
     @FXML
     private Button clearButton;
 
-    @FXML
-    private Button addIfMaxButton;
-    @FXML
-    private Button filterStartsWithNameButton;
-    @FXML
-    private Button groupByEndDateButton;
 
     @FXML
     private Button refreshButton;
@@ -134,15 +130,6 @@ public class MainWindowController {
     @FXML
     private Tooltip clearButtonTooltip;
 
-
-    @FXML
-    private Tooltip removeGreaterButtonTooltip;
-    @FXML
-    private Tooltip historyButtonTooltip;
-    @FXML
-    private Tooltip addIfMaxButtonTooltip;
-    @FXML
-    private Tooltip filterStartsWithNameButtonTooltip;
 
     @FXML
     private Tooltip refreshButtonTooltip;
@@ -171,7 +158,8 @@ public class MainWindowController {
     /**
      * Initialize main window.
      */
-    public void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeTable();
         initCanvas();
         fileChooser = new FileChooser();
@@ -219,7 +207,7 @@ public class MainWindowController {
                 new ReadOnlyObjectWrapper<>(cellData.getValue().getLectureHours()));
 
         creationDateColumn.setCellFactory(column -> {
-            TableCell<LabWork, Date> cell = new TableCell<LabWork, Date>() {
+            TableCell<LabWork, Date> cell = new TableCell<>() {
                 @Override
                 protected void updateItem(Date item, boolean empty) {
                     super.updateItem(item, empty);
@@ -233,6 +221,7 @@ public class MainWindowController {
 
             return cell;
         });
+
 
 
         //workerTable.setItems(FXCollections.observableArrayList());
@@ -251,10 +240,10 @@ public class MainWindowController {
                 .addFilter(coordinatesXColumn, (w) -> Double.toString(w.getCoordinates().getX()))
                 .addFilter(coordinatesYColumn, (w) -> Integer.toString(w.getCoordinates().getY()))
                 .addFilter(creationDateColumn, (w) -> DateConverter.dateToString(w.getCreationDate()))
-                .addFilter(minimalPointColumn, (w) -> Integer.toString(w.getMinimalPoint()) )
-                .addFilter(personalQualitiesMinimumColumn, (w) -> Integer.toString(w.getPersonalQualitiesMinimum()) )
+                .addFilter(minimalPointColumn, (w) -> Integer.toString(w.getMinimalPoint()))
+                .addFilter(personalQualitiesMinimumColumn, (w) -> Integer.toString(w.getPersonalQualitiesMinimum()))
 
-                .addFilter(minimalPointColumn, (w) -> Integer.toString(w.getMinimalPoint()) )
+                .addFilter(minimalPointColumn, (w) -> Integer.toString(w.getMinimalPoint()))
 
                 .addFilter(ownerColumn, (w) -> w.getUserLogin());
     }
@@ -337,9 +326,6 @@ public class MainWindowController {
         updateButton.textProperty().bind(resourceFactory.getStringBinding("UpdateButton"));
         removeButton.textProperty().bind(resourceFactory.getStringBinding("RemoveButton"));
         clearButton.textProperty().bind(resourceFactory.getStringBinding("ClearButton"));
-        addIfMaxButton.textProperty().bind(resourceFactory.getStringBinding("AddIfMaxButton"));
-        groupByEndDateButton.textProperty().bind(resourceFactory.getStringBinding("GroupByEndDateButton"));
-        filterStartsWithNameButton.textProperty().bind(resourceFactory.getStringBinding("FilterStartsWithNameButton"));
         refreshButton.textProperty().bind(resourceFactory.getStringBinding("RefreshButton"));
         helpButton.textProperty().bind(resourceFactory.getStringBinding("HelpButton"));
 
@@ -348,8 +334,6 @@ public class MainWindowController {
         updateButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("UpdateButtonTooltip"));
         removeButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("RemoveButtonTooltip"));
         clearButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("ClearButtonTooltip"));
-        removeGreaterButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("RemoveGreaterButtonTooltip"));
-        historyButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("HistoryButtonTooltip"));
         refreshButtonTooltip.textProperty().bind(resourceFactory.getStringBinding("RefreshButtonTooltip"));
     }
 
@@ -430,7 +414,6 @@ public class MainWindowController {
     }
 
 
-
     /**
      * Add button on action.
      */
@@ -448,88 +431,6 @@ public class MainWindowController {
         //if (marineRaw != null) requestAction(ADD_COMMAND_NAME, "", marineRaw);*/
     }
 
-    /**
-     * Add if min button on action.
-     */
-    @FXML
-    private void addIfMinButtonOnAction() {
-        try {
-            LabWork labWork = askWindowController.readLabWork();
-            if (labWork != null) {
-                client.getCommandManager().runCommand(new CommandMsg("add_if_min").setLabWork(labWork));
-                /*workerTable.refresh();
-                refreshCanvas();*/
-            }
-        } catch (InvalidDataException e) {
-
-        }
-
-    }
-
-    @FXML
-    private void addIfMaxButtonOnAction() {
-        try {
-            LabWork labWork = askWindowController.readLabWork();
-            if (labWork != null) {
-                client.getCommandManager().runCommand(new CommandMsg("add_if_max").setLabWork(labWork));
-                /*workerTable.refresh();
-                refreshCanvas();*/
-            }
-        } catch (InvalidDataException e) {
-
-        }
-    }
-
-
-    /**
-     * Remove greater button on action.
-     */
-    @FXML
-    private void groupByEndDateButtonOnAction() {
-        client.getCommandManager().runCommand(new CommandMsg("group_counting_by_end_date"));
-    }
-
-    /**
-     * History button on action.
-     */
-    @FXML
-    private void printUniqueSalariesButtonOnAction() {
-        client.getCommandManager().runCommand(new CommandMsg("print_unique_salary"));
-
-    }
-
-    /**
-     * Sum of health button on action.
-     */
-    @FXML
-    private void filterStartsWithNameButtonOnAction() {
-        Label startsWithLabel = new Label();
-        Stage stage = new Stage();
-        Label nameLabel = new Label();
-        TextField textField = new TextField();
-        Button button = new Button();
-        button.textProperty().bind(resourceFactory.getStringBinding("EnterButton"));
-        button.setOnAction((e) -> {
-            String arg = textField.getText();
-            if (arg != null && !arg.equals("")) {
-                client.getCommandManager().runCommand(new CommandMsg("filter_starts_with_name").setArgument(arg));
-                stage.close();
-            }
-
-        });
-        nameLabel.textProperty().bind(resourceFactory.getStringBinding("NameColumn"));
-        button.setAlignment(Pos.CENTER);
-
-        HBox hBox = new HBox(nameLabel, textField, button);
-        hBox.setAlignment(Pos.CENTER);
-        hBox.setSpacing(10);
-        Scene scene = new Scene(hBox);
-        stage.setScene(scene);
-        stage.setWidth(300);
-        stage.setHeight(100);
-        stage.setResizable(false);
-        stage.showAndWait();
-    }
 
     @FXML
     private void helpButtonOnAction() {
@@ -710,4 +611,6 @@ public class MainWindowController {
     public void setApp(App a) {
         app = a;
     }
+
+
 }

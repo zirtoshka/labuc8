@@ -116,7 +116,7 @@ public class App extends Application {
             //setMainWindow();
         } catch (Exception exception) {
             // TODO: Обработать ошибки
-            System.out.println(exception + "aaaa");
+            System.out.println(exception + " aaaa");
             exception.printStackTrace();
         }
     }
@@ -129,7 +129,7 @@ public class App extends Application {
             Parent mainWindowRootNode = mainWindowLoader.load();
             Scene mainWindowScene = new Scene(mainWindowRootNode);
             MainWindowController mainWindowController = mainWindowLoader.getController();
-            mainWindowController.initLangs(resourceFactory);
+//            mainWindowController.initLangs(resourceFactory);
 
             FXMLLoader askWindowLoader = new FXMLLoader();
             askWindowLoader.setLocation(getClass().getResource("/resources/view/AskWindow.fxml"));
@@ -153,8 +153,10 @@ public class App extends Application {
             mainWindowController.setPrimaryStage(primaryStage);
             mainWindowController.setAskWindowController(askWindowController);
             mainWindowController.refreshButtonOnAction();
-            mainWindowController.initLangs(resourceFactory);
             mainWindowController.setClient(client);
+            mainWindowController.initLangs(resourceFactory);
+
+
             mainWindowController.initFilter();
             mainWindowController.setApp(this);
 

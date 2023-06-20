@@ -56,12 +56,8 @@ public class ObservableResourceFactory {
 
             @Override
             public String computeValue() {
-                try {
                     return getResources().getString(key);
-                }catch (Exception e){
-                    e.printStackTrace();
-                    return null;
-                }
+
             }
         };
     }

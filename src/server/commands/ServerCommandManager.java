@@ -30,7 +30,6 @@ public class ServerCommandManager extends CommandManager {
         addCommand( new HelpCommand());
         addCommand(new InfoCommand(collectionManager));
         addCommand(new AddCommand(collectionManager));
-        addCommand(new AddIfMaxCommand(collectionManager));
         addCommand(new UpdateCommand(collectionManager));
         addCommand(new RemoveByIdCommand(collectionManager));
         addCommand(new ClearCommand(collectionManager));
