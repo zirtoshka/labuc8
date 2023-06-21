@@ -23,6 +23,11 @@ public abstract class CommandImpl implements Command{
         return name;
     }
 
+    @Override
+    public CollectionOperation getCollectionOperation() {
+        return CollectionOperation.NONE;
+    }
+
     /**
      * custom execute command
      *

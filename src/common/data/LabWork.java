@@ -58,6 +58,10 @@ public class LabWork implements Collectionable, Serializable {
         this.discipline = discipline;
     }
 
+    public LabWork(Integer id) {
+        this.id = id;
+    }
+
     public static class SortingComparator implements Comparator<LabWork> {
         public int compare(LabWork first, LabWork second) {
             return first.getName().compareTo(second.getName());

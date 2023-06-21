@@ -4,6 +4,7 @@ import common.auth.User;
 
 import common.commands.core.CommandImpl;
 import common.commands.core.CommandType;
+import common.connection.CollectionOperation;
 import common.exceptions.*;
 import common.data.*;
 import server.collection.CollectionManager;
@@ -16,6 +17,11 @@ public class UpdateCommand extends CommandImpl {
     public UpdateCommand(CollectionManager<LabWork> cm){
         super("update", CommandType.NORMAL);
         collectionManager = cm;
+    }
+
+    @Override
+    public CollectionOperation getCollectionOperation() {
+        return CollectionOperation.UPDATE;
     }
 
     @Override

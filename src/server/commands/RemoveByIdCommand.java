@@ -4,6 +4,7 @@ import common.auth.User;
 
 import common.commands.core.CommandImpl;
 import common.commands.core.CommandType;
+import common.connection.CollectionOperation;
 import common.exceptions.*;
 import common.data.*;
 import server.collection.CollectionManager;
@@ -16,6 +17,10 @@ public class RemoveByIdCommand extends CommandImpl {
         collectionManager = cm;
     }
 
+    @Override
+    public CollectionOperation getCollectionOperation() {
+        return CollectionOperation.REMOVE;
+    }
 
     @Override
     public String execute() throws InvalidDataException, AuthException {

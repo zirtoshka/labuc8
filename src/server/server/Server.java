@@ -126,6 +126,7 @@ public class Server extends Thread implements SenderReceiver {
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(buf.array()));
             request = (Request) objectInputStream.readObject();
+            request.setBroadcastAddress(clientAddress);
         } catch (ClassNotFoundException | ClassCastException | IOException e) {
             throw new InvalidReceivedDataException();
         }
@@ -181,7 +182,10 @@ public class Server extends Thread implements SenderReceiver {
                 return;
             }
             if(request.getStatus()==Request.Status.HELLO){
-                answerMsg = new AnswerMsg().setStatus(Response.Status.COLLECTION).setCollectionOperation(CollectionOperation.ADD).setCollection(collectionManager.getCollection());
+                answerMsg.setStatus(Response.Status.COLLECTION)
+                        .setCollectionOperation(CollectionOperation.ADD)
+                        .setCollection(collectionManager.getCollection());
+                System.out.println(activeClients.size());
                 activeClients.add(client);
                 responseQueue.offer(new AbstractMap.SimpleEntry<>(address, answerMsg));
                 return;
@@ -204,11 +208,11 @@ public class Server extends Thread implements SenderReceiver {
             }
             answerMsg = (AnswerMsg) commandManager.runCommand(request);
 
-
             if (answerMsg.getStatus() == Response.Status.EXIT) {
                 close();
             }
         } catch (CommandException e) {
+            System.err.println(e.getMessage());
             answerMsg.error(e.getMessage());
             Log.logger.error(e.getMessage());
         }
@@ -216,6 +220,19 @@ public class Server extends Thread implements SenderReceiver {
 
         //System.out.println(commandManager.getCommand(request).getOperation().toString());
         if(answerMsg.getCollectionOperation()!= CollectionOperation.NONE && answerMsg.getStatus()==Response.Status.FINE){
+            if (answerMsg.getCollection() == null) {
+                LabWork lab;
+
+                if (answerMsg.getCollectionOperation() == CollectionOperation.REMOVE) {
+                    lab = new LabWork(Integer.parseInt(request.getStringArg()));
+                } else {
+                    lab = request.getLabWork();
+                }
+
+                ArrayList<LabWork> collection = new ArrayList<>();
+                collection.add(lab);
+                answerMsg.setCollection(collection);
+            }
             answerMsg.setStatus(Response.Status.BROADCAST);
             broadcast(answerMsg, request.getBroadcastAddress());
         }

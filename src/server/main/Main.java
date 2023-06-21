@@ -20,10 +20,10 @@ public class Main {
         int port = 0;
         String strPort = "2023";
         String dbHost = "pg";
-        String user = "s367222";
-        String password = "C6AOvPuvcqpadRcO";
-//        String url = "jdbc:postgresql://" + dbHost + ":5432/studs";
-        String url = "jdbc:postgresql://localhost:5432/studs";
+        String user = "zirtoshka";
+        String password = "88951779";
+ //       String url = "jdbc:postgresql://" + dbHost + ":5432/studs";
+        String url = "jdbc:postgresql://localhost:5432/postgres";
 //        args = new String[]{"2023", "postgres", "postgres","s"};
         try {
             if (args.length == 4) {

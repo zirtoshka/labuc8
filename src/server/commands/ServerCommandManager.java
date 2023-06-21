@@ -17,6 +17,8 @@ import server.collection.LabWorkCollectionManager;
 import server.log.Log;
 import server.server.Server;
 
+import java.util.ArrayList;
+
 public class ServerCommandManager extends CommandManager {
     private final Server server;
 
@@ -70,6 +72,7 @@ public class ServerCommandManager extends CommandManager {
 
             //executing command
             res = (AnswerMsg) super.runCommand(msg);
+            res.setCollectionOperation(cmd.getCollectionOperation());
         } catch (ConnectionException | CommandException e) {
             res.error(e.getMessage());
         }

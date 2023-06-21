@@ -4,6 +4,7 @@ package client.controllers;
 import client.client.Client;
 import client.controllers.tools.ObservableResourceFactory;
 import client.controllers.tools.TableFilter;
+
 import client.controllers.tools.ZoomOperator;
 import client.main.App;
 import common.connection.CommandMsg;
@@ -15,6 +16,7 @@ import common.exceptions.ConnectionTimeoutException;
 import common.exceptions.InvalidDataException;
 import common.utils.DateConverter;
 import javafx.animation.ScaleTransition;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -36,6 +38,7 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -93,10 +96,10 @@ public class MainWindowController implements Initializable {
     @FXML
     private TableColumn<LabWork, Difficulty> difficultyColumn;
     @FXML
-    private TableColumn<Discipline, String> nameDisciplineColumn;
+    private TableColumn<LabWork, String> nameDisciplineColumn;
 
     @FXML
-    private TableColumn<Discipline, Integer> lectureHoursDisciplineColumn;
+    private TableColumn<LabWork, Integer> lectureHoursDisciplineColumn;
     @FXML
     private AnchorPane canvasPane;
     @FXML
@@ -161,7 +164,7 @@ public class MainWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeTable();
-        initCanvas();
+//        initCanvas();
         fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("."));
         userColorMap = new HashMap<>();
@@ -169,10 +172,11 @@ public class MainWindowController implements Initializable {
         textMap = new HashMap<>();
         randomGenerator = new Random(RANDOM_SEED);
         localeMap = new HashMap<>();
-        localeMap.put("English", new Locale("en", "NZ"));
+        DateConverter.setPattern("dd.MM.yyyy");
         localeMap.put("Русский", new Locale("ru", "RU"));
-        localeMap.put("Deutsche", new Locale("de", "DE"));
-        localeMap.put("Dansk", new Locale("da", "DK"));
+        localeMap.put("Español", new Locale("es", "NI"));
+        localeMap.put("Český", new Locale("cs", "CS"));
+        localeMap.put("Català", new Locale("ca", "CA"));
         languageComboBox.setItems(FXCollections.observableArrayList(localeMap.keySet()));
     }
 
@@ -202,9 +206,9 @@ public class MainWindowController implements Initializable {
         difficultyColumn.setCellValueFactory(cellData ->
                 new ReadOnlyObjectWrapper<>(cellData.getValue().getDifficulty()));
         nameDisciplineColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getName()));
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getDiscipline().getName()));
         lectureHoursDisciplineColumn.setCellValueFactory(cellData ->
-                new ReadOnlyObjectWrapper<>(cellData.getValue().getLectureHours()));
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getDiscipline().getLectureHours()));
 
         creationDateColumn.setCellFactory(column -> {
             TableCell<LabWork, Date> cell = new TableCell<>() {
@@ -222,14 +226,8 @@ public class MainWindowController implements Initializable {
             return cell;
         });
 
+        labWorkTable.setItems(FXCollections.observableArrayList());
 
-
-        //workerTable.setItems(FXCollections.observableArrayList());
-        //s TableFilter<Worker> tableFilter = TableFilter.forTableView(workerTable).apply();
-        /*workerTable.setOnSort((e)->{
-            workerTable.getSortOrder().stream().sorted().collect();
-        });*/
-        //FilteredTableView y;
 
     }
 
@@ -259,7 +257,6 @@ public class MainWindowController implements Initializable {
     private void initCanvas() {
         ZoomOperator zoomOperator = new ZoomOperator();
 
-// Listen to scroll events (similarly you could listen to a button click, slider, ...)
         canvasPane.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
@@ -273,11 +270,6 @@ public class MainWindowController implements Initializable {
                 double x = event.getSceneX();
                 double y = event.getSceneY();
 
-                //if(!(event.getDeltaY()<=0 && (zoomOperator.getBounds().getHeight()<=1000||zoomOperator.getBounds().getWidth()<=1000))){
-                /*if((event.getDeltaY()<=0 && (zoomOperator.getBounds().getMinX()>=1000||
-                        zoomOperator.getBounds().getMinY()>=1000||
-                        zoomOperator.getBounds().getMaxX()<=2000-1000||
-                        zoomOperator.getBounds().getMaxY()<=2000-1000))) return;*/
                 if ((event.getDeltaY() <= 0 && (zoomOperator.getBounds().getHeight() <= 500 || zoomOperator.getBounds().getWidth() <= 500)))
                     return;
                 zoomOperator.zoom(canvasPane, zoomFactor, x, y);
@@ -285,12 +277,7 @@ public class MainWindowController implements Initializable {
 
             }
         });
-        /*canvasPane.setOnMouseDragged(event -> {
-            canvasPane.setManaged(false);
-            canvasPane.setTranslateX(event.getX() + canvasPane.getTranslateX());
-            canvasPane.setTranslateY(event.getY() + canvasPane.getTranslateY());
-            event.consume();
-        });*/
+
 
         zoomOperator.draggable(canvasPane);
         canvasPane.setMinWidth(2000);
@@ -342,7 +329,9 @@ public class MainWindowController implements Initializable {
      */
     @FXML
     public void refreshButtonOnAction() {
-        requestAction(REFRESH_COMMAND_NAME);
+        client.close();
+        app.initClient();
+        app.setLoginWindow();
     }
 
     /**
@@ -350,7 +339,7 @@ public class MainWindowController implements Initializable {
      */
     @FXML
     private void infoButtonOnAction() {
-        client.getCommandManager().runCommand(new CommandMsg("info"));
+        requestAction(INFO_COMMAND_NAME);
     }
 
 
@@ -359,58 +348,42 @@ public class MainWindowController implements Initializable {
      */
     @FXML
     private void updateButtonOnAction() {
-       /* Worker worker = null;
-        try {
-            worker = new DefaultWorker("a",new Coordinates(1,2L),1000L, DateConverter.parseLocalDate("2000-01-01"),
-                    Position.BAKER,Status.PROBATION,new Organization("XXX",OrganizationType.GOVERNMENT));
-        } catch (InvalidDateFormatException e) {
-            e.printStackTrace();
-        }
-        workerTable.getItems().add(worker);
-*/
-        LabWork labWork = labWorkTable.getSelectionModel().getSelectedItem();
-        // int idx = workerTable.getSelectionModel().getSelectedIndex() + 1;
-        //int i = workerTable.getSelectionModel().getSelectedIndex();
-        if (labWork != null) {
-            askWindowController.setLabWork(labWork);
-            try {
-                client.getCommandManager().runCommand(new CommandMsg("update").setArgument(Integer.toString(labWork.getId())).setLabWork(askWindowController.readLabWork()));
-            } catch (InvalidDataException e) {
-                //e.printStackTrace();
-            }
-        }
-
-
-        /*if (!spaceMarineTable.getSelectionModel().isEmpty()) {
-            long id = spaceMarineTable.getSelectionModel().getSelectedItem().getId();
-            askWindowController.setMarine(spaceMarineTable.getSelectionModel().getSelectedItem());
+        if (!labWorkTable.getSelectionModel().isEmpty()) {
+            long id = labWorkTable.getSelectionModel().getSelectedItem().getId();
+            askWindowController.setLabWork(labWorkTable.getSelectionModel().getSelectedItem());
             askStage.showAndWait();
-            MarineRaw marineRaw = askWindowController.getAndClear();
-            if (marineRaw != null) requestAction(UPDATE_COMMAND_NAME, id + "", marineRaw);
-        } else OutputterUI.error("UpdateButtonSelectionException");*/
+            LabWork labWork = askWindowController.getAndClear();
+            if (labWork != null) requestAction(UPDATE_COMMAND_NAME, id + "", labWork);
+        } else {
+            System.out.println("xdddfgdfnsskjfskjfskfushfuwfhwfkwhfwkf");
+        }
 
     }
+
+
+
 
     /**
      * Remove button on action.
      */
     @FXML
     private void removeButtonOnAction() {
-        LabWork labWork = labWorkTable.getSelectionModel().getSelectedItem();
-        if (labWork != null)
-            client.getCommandManager().runCommand(new CommandMsg("remove_by_id").setArgument(Integer.toString(labWork.getId())));
-        /*if (!spaceMarineTable.getSelectionModel().isEmpty())
+
+
+        if (!labWorkTable.getSelectionModel().isEmpty())
             requestAction(REMOVE_COMMAND_NAME,
-                    spaceMarineTable.getSelectionModel().getSelectedItem().getId().toString(), null);
-        else OutputterUI.error("RemoveButtonSelectionException");*/
+                    (String.valueOf(labWorkTable.getSelectionModel().getSelectedItem().getId())), null);
+        else {
+            System.out.println("jfkldsjfklsfjsflkdjflsfksjd");        }
     }
+
 
     /**
      * Clear button on action.
      */
     @FXML
     private void clearButtonOnAction() {
-        client.getCommandManager().runCommand(new CommandMsg("clear"));
+        requestAction(CLEAR_COMMAND_NAME);
     }
 
 
@@ -419,16 +392,10 @@ public class MainWindowController implements Initializable {
      */
     @FXML
     private void addButtonOnAction() {
-        //askWindowController.clearMarine();
-
-        try {
-            client.getCommandManager().runCommand(new CommandMsg("add").setLabWork(askWindowController.readLabWork()));
-        } catch (InvalidDataException e) {
-
-        }
-        /*workerTable.refresh();
-        refreshCanvas();*/
-        //if (marineRaw != null) requestAction(ADD_COMMAND_NAME, "", marineRaw);*/
+        askWindowController.clearLabWork();
+        askStage.showAndWait();
+        LabWork labWork=askWindowController.getAndClear();
+        if (labWork != null) requestAction(ADD_COMMAND_NAME, "", labWork);
     }
 
 
@@ -440,30 +407,9 @@ public class MainWindowController implements Initializable {
     /**
      * Request action.
      */
-    private void requestAction(String commandName, String commandStringArgument, Serializable commandObjectArgument) {
-        /*NavigableSet<SpaceMarine> responsedMarines = client.processRequestToServer(commandName, commandStringArgument,
+    private void requestAction(String commandName, String commandStringArgument, LabWork commandObjectArgument) {
+        client.processRequestToServer(commandName, commandStringArgument,
                 commandObjectArgument);
-        if (responsedMarines != null) {
-            ObservableList<SpaceMarine> marinesList = FXCollections.observableArrayList(responsedMarines);
-            spaceMarineTable.setItems(marinesList);
-            TableFilter.forTableView(spaceMarineTable).apply();
-            spaceMarineTable.getSelectionModel().clearSelection();
-            refreshCanvas();
-        }*/
-    }
-
-    private boolean askServer(Request request) {
-        Response response;
-        try {
-            client.send(request);
-            response = client.receive();
-        } catch (ConnectionTimeoutException e) {
-            app.getOutputManager().error("ConnectionTimeoutException");
-        } catch (InvalidDataException | ConnectionException e) {
-            app.getOutputManager().error("ConnectionException");
-        }
-        //if(response!=null)
-        return false;
     }
 
     /**
@@ -593,12 +539,13 @@ public class MainWindowController implements Initializable {
             Locale locale = localeMap.get(languageComboBox.getValue());
             resourceFactory.setResources(ResourceBundle.getBundle
                     (App.BUNDLE, locale));
+            System.out.println(locale.toString() + " aaaaa");
             switch (locale.toString()) {
-                case "en_NZ":
+                case "ca_CA":
                     DateConverter.setPattern("yyyy-MM-dd");
                     break;
                 case "ru_RU":
-                    DateConverter.setPattern("yyyy/MM/dd");
+                    DateConverter.setPattern("dd.MM.yyyy");
                     break;
             }
 
@@ -612,5 +559,19 @@ public class MainWindowController implements Initializable {
         app = a;
     }
 
+    public void messageInfo(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("");
+        alert.setHeaderText("");
+        alert.setContentText(String.valueOf(msg));
+        alert.showAndWait();
+    }
 
+    public void messageError(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("");
+        alert.setHeaderText("");
+        alert.setContentText(String.valueOf(msg));
+        alert.showAndWait();
+    }
 }

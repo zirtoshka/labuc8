@@ -4,6 +4,7 @@ import common.auth.User;
 
 import common.commands.core.CommandImpl;
 import common.commands.core.CommandType;
+import common.connection.CollectionOperation;
 import common.data.LabWork;
 import common.exceptions.EmptyCollectionException;
 import common.exceptions.InvalidDataException;
@@ -16,6 +17,11 @@ public class ClearCommand extends CommandImpl {
     public ClearCommand(CollectionManager<LabWork> cm) {
         super("clear", CommandType.NORMAL);
         collectionManager = (LabWorkDatabaseManager) cm;
+    }
+
+    @Override
+    public CollectionOperation getCollectionOperation() {
+        return CollectionOperation.CLEAR;
     }
 
     @Override

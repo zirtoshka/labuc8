@@ -2,6 +2,7 @@ package server.commands;
 
 import common.commands.core.CommandImpl;
 import common.commands.core.CommandType;
+import common.connection.CollectionOperation;
 import common.exceptions.*;
 import server.collection.CollectionManager;
 import common.data.LabWork;
@@ -15,6 +16,11 @@ public class RemoveLowerCommand extends CommandImpl {
     public RemoveLowerCommand(CollectionManager<LabWork> cm){
         super("remove_lower", CommandType.NORMAL);
         collectionManager = cm;
+    }
+
+    @Override
+    public CollectionOperation getCollectionOperation() {
+        return CollectionOperation.REMOVE;
     }
 
     @Override

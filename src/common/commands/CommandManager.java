@@ -47,6 +47,7 @@ public abstract class CommandManager implements Commandable, Closeable {
     }
 
     public Command getCommand(String s){
+        System.out.println(s+"ddddddd");
         if (!hasCommand(s)) throw new NoSuchCommandException();
         Command cmd =  commands.get(s);
         return cmd;

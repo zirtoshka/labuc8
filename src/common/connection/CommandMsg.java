@@ -14,11 +14,12 @@ public class CommandMsg implements Request {
     private LabWork labWork;
     private User user;
     private Status status;
+    private InetSocketAddress broadcastAddress;
 
     public CommandMsg(String commandNm, String commandSA, LabWork labWork) {
         commandName = commandNm;
         commandStringArgument = commandSA;
-        labWork = labWork;
+        this.labWork = labWork;
         user = null;
         status = Status.DEFAULT;
     }
@@ -38,7 +39,7 @@ public class CommandMsg implements Request {
     public CommandMsg(String commandNm, String commandSA, LabWork labWork, User usr) {
         commandName = commandNm;
         commandStringArgument = commandSA;
-        labWork = labWork;
+        this.labWork = labWork;
         user = usr;
         status = Status.DEFAULT;
     }
@@ -54,7 +55,12 @@ public class CommandMsg implements Request {
 
     @Override
     public InetSocketAddress getBroadcastAddress() {
-        return null;
+        return broadcastAddress;
+    }
+
+    @Override
+    public void setBroadcastAddress(InetSocketAddress broadcastAddress) {
+        this.broadcastAddress = broadcastAddress;
     }
 
     public CommandMsg setUser(User usr) {

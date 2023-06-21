@@ -19,6 +19,7 @@ public interface Request extends Serializable {
 
     Status getStatus();
     InetSocketAddress getBroadcastAddress();
+    void setBroadcastAddress(InetSocketAddress broadcastAddress);
 
     Request setStatus(Status s);
 

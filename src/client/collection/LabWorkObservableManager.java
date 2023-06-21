@@ -30,6 +30,10 @@ public class LabWorkObservableManager extends LabWorkManagerImpl<ObservableList<
         CollectionOperation op = response.getCollectionOperation();
         Collection<LabWork> changes = response.getCollection();
 
+        if (op==CollectionOperation.CLEAR) {
+            super.clear();
+        }
+
         if(op==CollectionOperation.ADD){
             for(LabWork labWork: changes){
                 super.addWithoutIdGeneration(labWork);
@@ -74,5 +78,13 @@ public class LabWorkObservableManager extends LabWorkManagerImpl<ObservableList<
     }
     public MainWindowController getController(){
         return controller;
+    }
+
+    public void messageInfo(String str) {
+        Platform.runLater(() -> controller.messageInfo(str));
+    }
+
+    public void messageError(String str) {
+        Platform.runLater(() -> controller.messageError(str));
     }
 }

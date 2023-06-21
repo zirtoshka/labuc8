@@ -54,7 +54,7 @@ public class ClientCommandManager extends CommandManager {
                 //lock.unlock();
             }
         }
-        print(res);
+        client.messageInfo(res.getMessage());
         return res;
     }
 

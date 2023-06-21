@@ -74,7 +74,6 @@ public class AskWindowController {
 
     @FXML
     public void initialize() {
-        askStage = new Stage();
         difficultyBox.setItems(FXCollections.observableArrayList(Difficulty.values()));
     }
 
@@ -153,9 +152,6 @@ public class AskWindowController {
         return averagePoint;
     }
 
-    public Difficulty readDifficulty() {
-        return  difficultyBox.getSelectionModel().getSelectedItem();
-    }
     public Integer readLectureHours() throws InvalidNumberException {
         Integer lectureHours;
         try{
@@ -198,70 +194,46 @@ public class AskWindowController {
     @FXML
     private void enterButtonOnAction() {
         try {
-
-            String name = readName();
-            Coordinates coords = readCoords();
-            Integer minimalPoint = readMinimalPoint();
-            int personalQualitiesMinimum=readPersonalQualitiesMinimum();
-            Double averagePoint=readAveragePoint();
-            Difficulty difficulty = readDifficulty();
-            Discipline discipline=readDiscipline();
-            labWork = new LabWork(name, coords, minimalPoint, personalQualitiesMinimum, averagePoint,difficulty,discipline);
+            resultLabWork = new LabWork(
+                    readName(),
+                    readCoords(),
+                    readMinimalPoint(),
+                    readPersonalQualitiesMinimum(),
+                    readAveragePoint(),
+                    difficultyBox.getValue(),
+                    readDiscipline()
+            );
             askStage.close();
         } catch (InvalidDataException | IllegalArgumentException exception) {
             app.getOutputManager().error(exception.getMessage());
         }
     }
-/*
-    public String readPassword() throws InvalidDataException {
-        String s = read();
-        if (s.equals("")) throw new EmptyStringException();
-        return s;
-    }
+    public void clearLabWork() {
+        nameField.clear();
+        coordinatesXField.clear();
+        coordinatesYField.clear();
+        minimalPointField.clear();
+        personalQualitiesMinimumField.clear();
+        averagePointField.clear();
+        difficultyBox.setValue(Difficulty.HOPELESS);
+        nameDisciplineField.clear();
+        lectureHoursDisciplineField.clear();
 
-    public String readLogin() throws InvalidDataException {
-        String s = read();
-        if (s.equals("")) throw new EmptyStringException();
-        return s;
     }
-
-    public User readUser() throws InvalidDataException {
-        return new User(readPassword(), readLogin());
+    public LabWork getAndClear() {
+        LabWork labWorkToReturn = resultLabWork;
+        resultLabWork = null;
+        return labWorkToReturn;
     }
-
-    public CommandMsg readCommand() {
-        String cmd = read();
-        String arg = null;
-        Worker worker = null;
-        User user = null;
-        if (cmd.contains(" ")) { //if command has argument
-            String[] arr = cmd.split(" ", 2);
-            cmd = arr[0];
-            arg = arr[1];
-        }
-        if (cmd.equals("add") || cmd.equals("add_if_min") || cmd.equals("add_if_max") || cmd.equals("update")) {
-            try {
-                worker = readWorker();
-            } catch (InvalidDataException ignored) {
-            }
-        } else if (cmd.equals("login") || cmd.equals("register")) {
-            try {
-                user = readUser();
-            } catch (InvalidDataException ignored) {
-            }
-            return new CommandMsg(cmd, null, null, user);
-        }
-        return new CommandMsg(cmd, arg, worker);
-    }*/
 
     public void setAskStage(Stage askStage) {
         this.askStage = askStage;
-        this.askStage.setOnCloseRequest((e) -> labWork = null);
+
     }
 
-    public void setApp(App app) {
-        this.app = app;
-    }
+//    public void setApp(App app) {
+//        this.app = app;
+//    }
 
     /**
      * Init langs.

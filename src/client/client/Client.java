@@ -1,19 +1,19 @@
 package client.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.NavigableSet;
 
 import client.collection.LabWorkObservableManager;
 import client.commands.ClientCommandManager;
+import client.controllers.MainWindowController;
 import client.controllers.tools.ObservableResourceFactory;
 import client.controllers.tools.ResourceException;
 import common.auth.User;
 import common.connection.*;
+import common.data.LabWork;
 import common.exceptions.*;
 import common.io.OutputManager;
 
@@ -97,7 +97,7 @@ public class Client extends Thread implements SenderReceiver {
         }
         try {
             socket = new DatagramSocket();
-            broadcastSocket = new DatagramSocket(3333);
+            broadcastSocket = new DatagramSocket();
             socket.setSoTimeout(MAX_TIME_OUT);
         } catch (IOException e) {
             throw new ConnectionException("cannot open socket");
@@ -160,8 +160,12 @@ public class Client extends Thread implements SenderReceiver {
         connected=true;
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(bytes.array()));
-            return (Response) objectInputStream.readObject();
+
+            Response response = (Response) objectInputStream.readObject();
+            System.out.println(response.getStatus());
+            return response;
         } catch (ClassNotFoundException | ClassCastException | IOException e) {
+            System.out.println(e.getMessage());
             throw new InvalidReceivedDataException();
         }
 
@@ -184,8 +188,12 @@ public class Client extends Thread implements SenderReceiver {
         connected=true;
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(bytes.array()));
-            return (Response) objectInputStream.readObject();
+
+            Response response = (Response) objectInputStream.readObject();
+            System.out.println(response.getStatus());
+            return response;
         } catch (ClassNotFoundException | ClassCastException | IOException e) {
+            System.out.println(e.getMessage());
             throw new InvalidReceivedDataException();
         }
     }
@@ -246,18 +254,18 @@ public class Client extends Thread implements SenderReceiver {
                     case EXIT:
                         connected=false;
                         print("server shut down");
-                        outputManager.printErr("[ServerShutDown]");
+                        OutputManager.printErr("[ServerShutDown]");
                         break;
                         //TODO when server closed exit on login
                     case FINE:
                         try {
-                            outputManager.print(msg);
+                            collectionManager.messageInfo(msg);
                         } catch (ResourceException ignored){
 
                         }
                         break;
                     case ERROR:
-                        outputManager.printErr(msg);
+                        collectionManager.messageError(msg);
 
                     default:
                         print(msg);
@@ -309,6 +317,18 @@ public class Client extends Thread implements SenderReceiver {
             connected=false;
         }
     }
+    public void processRequestToServer(String commandName, String commandStringArgument,
+                                                      LabWork commandObjectArgument) {
+        Request requestToServer = null;
+        Response serverResponse = null;
+        try {
+            requestToServer = new CommandMsg(commandName, commandStringArgument, commandObjectArgument, user);
+            send(requestToServer);
+//            serverResponse = receive();
+        } catch (ConnectionException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void consoleMode(){
         commandManager.consoleMode();
     }
@@ -348,6 +368,14 @@ public class Client extends Thread implements SenderReceiver {
         running = false;
         commandManager.close();
         socket.close();
+    }
+
+    public void messageInfo(String str) {
+        collectionManager.messageInfo(str);
+    }
+
+    public void messageError(String str) {
+        collectionManager.messageError(str);
     }
 
 }

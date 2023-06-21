@@ -4,6 +4,7 @@ public enum CollectionOperation {
     ADD,
     UPDATE,
     REMOVE,
+    CLEAR,
     NONE;
 
 }
