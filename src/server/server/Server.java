@@ -220,7 +220,9 @@ public class Server extends Thread implements SenderReceiver {
 
         //System.out.println(commandManager.getCommand(request).getOperation().toString());
         if(answerMsg.getCollectionOperation()!= CollectionOperation.NONE && answerMsg.getStatus()==Response.Status.FINE){
-            if (answerMsg.getCollection() == null) {
+            if (answerMsg.getCollectionOperation() == CollectionOperation.CLEAR) {
+                answerMsg.setCollection(collectionManager.getCollection());
+            } else if (answerMsg.getCollection() == null) {
                 LabWork lab;
 
                 if (answerMsg.getCollectionOperation() == CollectionOperation.REMOVE) {

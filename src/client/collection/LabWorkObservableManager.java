@@ -30,28 +30,37 @@ public class LabWorkObservableManager extends LabWorkManagerImpl<ObservableList<
         CollectionOperation op = response.getCollectionOperation();
         Collection<LabWork> changes = response.getCollection();
 
+        boolean updated = false;
+
         if (op==CollectionOperation.CLEAR) {
+            updated = true;
             super.clear();
+            for(LabWork labWork: changes){
+                super.addWithoutIdGeneration(labWork);
+            }
         }
 
         if(op==CollectionOperation.ADD){
             for(LabWork labWork: changes){
+                updated = true;
                 super.addWithoutIdGeneration(labWork);
             }
         }
         if(op==CollectionOperation.REMOVE){
             for(LabWork labWork: changes){
+                updated = true;
                 super.removeByID(labWork.getId());
             }
         }
         if(op==CollectionOperation.UPDATE){
             for(LabWork labWork: changes){
+                updated = true;
                 super.updateByID(labWork.getId(),labWork);
             }
         }
-        if(controller!=null && op!=CollectionOperation.NONE && changes!=null && !changes.isEmpty()){
+        if(updated){
             Platform.runLater(()->{
-
+                System.out.println("xyu");
                 controller.refreshCanvas();
                 controller.refreshTable();
             });

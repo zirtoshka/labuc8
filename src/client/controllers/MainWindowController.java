@@ -434,7 +434,11 @@ public class MainWindowController implements Initializable {
         shapeMap.clear();
         textMap.values().forEach(s -> canvasPane.getChildren().remove(s));
         textMap.clear();
-        SortedList<LabWork> list = labWorkTable.getItems().sorted((w1, w2) -> w1.getName().compareTo(w2.getName()) > 0 ? 0 : 1);
+        List<LabWork> list = client.getCollection()
+                .stream()
+                .sorted((w1, w2) -> w1.getName()
+                .compareTo(w2.getName()) > 0 ? 0 : 1)
+                .toList();
         for (LabWork labWork : list) {
             if (!userColorMap.containsKey(labWork.getUserLogin()))
                 userColorMap.put(labWork.getUserLogin(),

@@ -378,4 +378,8 @@ public class Client extends Thread implements SenderReceiver {
         collectionManager.messageError(str);
     }
 
+    public Collection<LabWork> getCollection() {
+        return collectionManager.getCollection();
+    }
+
 }
